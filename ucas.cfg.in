@@ -1,0 +1,8 @@
+[server]
+scriptname: /baseurl
+host: hostname
+port: portno
+
+[database]
+dbfile: dbfilename
+
