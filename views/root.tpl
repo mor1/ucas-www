@@ -20,11 +20,19 @@
 %if ((not ucasid) or (ucasid and error)):
 <form method="post">
   <fieldset>
-    <legend>Enter your UCAS ID to retrieve an existing booking</legend>
+    <legend>Enter your UCAS ID and either name or email to retrieve an existing booking</legend>
     <ol>
       <li>
         <label for="ucasid">UCAS Id</label>
         <input type="text" name="ucasid" autofocus required />
+      </li>
+      <li>
+        <label for="name">Name</label>
+        <input type="text" name="name" />
+      </li>
+      <li>
+        <label for="email">Email</label>
+        <input type="text" name="email" />
       </li>
     </ol>
     <input type="submit" value="retrieve booking" />
@@ -34,13 +42,10 @@
 
 %if booking:
 <div id="booking">
-  {{ booking }}
+  <span id="ucasid">{{ booking['ucasid'] }}</span>
+  <span id="name">{{ booking['name'] }}</span>
+  <span id="email">{{ booking['email'] }}</span>
 </div>
 %end
 
-%if error:
-<div id="error">
-  ERROR! {{ error }}
-</div>
-
-%rebase layout title="School of Computer Science, Discussion Group Signup"
+%rebase layout title="UCAS Discussion Group Signup", error=error

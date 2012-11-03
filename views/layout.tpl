@@ -15,7 +15,7 @@
     %include
     
     <div id="footer">
-      %include footer title='{{ title }}'
+      %include footer error=error
     </div>
   </body>
 </html>
