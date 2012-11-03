@@ -47,7 +47,7 @@ def index(name='World'):
 
 @app.route('/dbtest/:item<:re:/?>')
 def dbtest(db, item):
-    n = db.execute('SELECT * from `applicants` where `ucasid` like "test-%"')
+    n = db.execute('SELECT * from `ucas.applicants` where `ucasid` like "test-%"')
     print n
     row = db.fetchone()
     if row:
