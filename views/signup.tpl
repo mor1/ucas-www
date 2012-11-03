@@ -1,4 +1,3 @@
-%# 
 <form method="post">
   <fieldset>
     <legend>
@@ -8,11 +7,11 @@
     <ol>
       <li>
         <label for="ucasid">UCAS Id</label>
-        <input type="text" name="ucasid" />
+        <input type="text" name="ucasid" required autofocus />
       </li>
       <li>
         <label for="name">Name</label>
-        <input type="text" name="name" />
+        <input type="text" name="name" required />
       </li>
       <li>
         <label for="email">Contact Email</label>
