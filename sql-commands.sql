@@ -11,7 +11,7 @@ create database if not exists `rmm`
 
 create table if not exists `rmm`.`ucas.applicants` (
   ucasid varchar(32),
-  n varchar(64),
+  name varchar(64),
   email varchar(128)
 );
 

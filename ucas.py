@@ -41,18 +41,43 @@ plugin = bottle_mysql.Plugin(
     )
 app.install(plugin)
 
-@app.route('/hello/:name<:re:/?>')
-def index(name='World'):
-    return template('<b>Hello {{name}}</b>!', name=name)
+# @app.route('/hello/:name<:re:/?>')
+# def index(name='World'):
+#     return template('<b>Hello {{name}}</b>!', name=name)
 
-@app.route('/dbtest/:item<:re:/?>')
-def dbtest(db, item):
-    n = db.execute('SELECT * from `ucas.applicants` where `ucasid` like "test-%"')
-    print n
+# @app.route('/dbtest/:item<:re:/?>')
+# def dbtest(db, item):
+#     n = db.execute('SELECT * from `ucas.applicants` where `ucasid` like "test-%"')
+#     print n
+#     row = db.fetchone()
+#     if row:
+#         return template('showitem', item=row)
+#     return bottle.HTTPError(404, "Page not found")
+
+@app.get('/')
+def root():
+    bottle.redirect('/signup')
+
+@app.get('/signup')
+def signup(db):
+    slots = [ { 'value':'v', 'display':'d', },
+              ]
+    return template('signup', slots=slots)
+
+@app.post('/signup')
+def do_signup(db):
+    return template('signedup')
+
+@app.get('/signup/<ucasid:re:[0-9-]+>')
+def get_signup(db, ucasid=None):
+    n = db.execute(
+        'SELECT * FROM `ucas.applicants` WHERE `ucasid` LIKE "%s"' 
+        % (ucasid, ))
+    if n == 0: return template('signup-error')
+
     row = db.fetchone()
-    if row:
-        return template('showitem', item=row)
-    return bottle.HTTPError(404, "Page not found")
+    if not row: return template('signup-error')
+    return template('signup-details', entry=row)
 
 if __name__ == '__main__':
     run(app, host='localhost', port=8080, reloader=True, debug=True)
