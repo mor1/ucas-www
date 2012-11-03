@@ -28,6 +28,8 @@ import ConfigParser
 Config = ConfigParser.ConfigParser()
 Config.read('ucas.ini')
 
+STATIC_FILES = ('favicon.ico', 'robots.txt', 'css/ucas.css', )
+
 import bottle, bottle_mysql
 from bottle import request, template, redirect
 
@@ -44,40 +46,33 @@ app.install(plugin)
 def root(): 
     '''Entry page, permitting booking retrieval.'''
 
-    return template('root', error=None, booking=None, ucasid=None)
+    return template('root', error=None, booking=None)
 
 @app.post('/')
-@app.get('/signup/<ucasid:re:[0-9]{3}-[0-9]{3}-[0-9]{4}>')
-def retrieve_booking(db, ucasid=None):
-    '''Retrieve existing booking, indexed by UCAS ID.'''
+@app.get('/signup/<ucasid:re:[0-9]{3}-[0-9]{3}-[0-9]{4}>/<name>')
+def retrieve_booking(db, ucasid=None, name=None):
+    '''Retrieve existing booking, indexed by <ucasid> and <name>.'''
 
     booking = error = None
-    if not ucasid:
-        ucasid = request.forms.ucasid
-    name = request.forms.name
-    email = request.forms.email
-        
-    cmd = "SELECT * FROM `ucas.applicants` WHERE `ucasid`=%s"
-    n = db.execute(cmd, (ucasid,))
-    if n == 1: 
-        booking = db.fetchone()
-        if not booking: 
-            error = "booking"
-        print booking
-        if booking['name'] != name and booking['email'] != email:
-            error = "booking-mismatch"
-            booking = None
     
+    if request.method == "POST":
+        ucasid = request.forms.ucasid
+        name = request.forms.name
+    
+    cmd = "SELECT * FROM `ucas.bookings` WHERE `ucasid`=%s AND `name`=%s"
+    n = db.execute(cmd, (ucasid, name))
+    if n != 1: error = "booking-mismatch"
     else:
-        error = "unknown-ucasid"
+        booking = db.fetchone()
+        if not booking: error = "booking-fetch"
 
-    return template('root', error=error, booking=booking, ucasid=ucasid)
+    return template('root', error=error, booking=booking)
 
 @app.get('/<filename:path>')
 def static(filename): 
     '''Retrieve static resource.'''
 
-    if filename in ('favicon.ico', 'robots.txt', 'css/ucas.css', ):
+    if filename in STATIC_FILES:
         return bottle.static_file(filename, root='./static')
     return bottle.HTTPError(404, "Page not found")            
 
@@ -85,41 +80,54 @@ def static(filename):
 def signup(db):
     '''Display signup form.'''
     
-    slots = [ { 'value':'v', 'display':'d', },
-              ]
-    return template('signup', error=None, slots=slots)
+    cmd = "SELECT * FROM `ucas.slots` WHERE `spaces` > 0"
+    db.execute(cmd)
+    return template('signup', error=None, slots=db.fetchall())
 
 @app.post('/signup')
 def do_signup(db):
     '''Create booking.'''
 
-    error = None
-    slots = [ { 'value':'v', 'display':'d', },
-              ]
-
+    booking = error = None
+    
     ucasid = request.forms.ucasid
     name = request.forms.name
     email = request.forms.email
-    print ucasid, name, email
+    slotid = request.forms.slotid
 
-    cmd = "SELECT * FROM `ucas.applicants` WHERE `ucasid`=%s"
-    n = db.execute(cmd, (ucasid,))
+    cmd = "SELECT * FROM `ucas.bookings` WHERE `ucasid`=%s AND `name`=%s"
+    n = db.execute(cmd, (ucasid, name))
     if n == 0:
-        cmd = "INSERT INTO `ucas.applicants` VALUES (%s, %s, %s)"
-        db.execute(cmd, (ucasid, name, email,))
+        cmd = "UPDATE `ucas.slots` "\
+            + "SET `spaces` = `spaces`-1 WHERE `slotid`=%s"
+        db.execute(cmd, (slotid,))
+        
+        cmd = "INSERT INTO `ucas.bookings` VALUES (%s, %s, %s, %s)"
+        db.execute(cmd, (ucasid, name, email, slotid,))
+        
     else:
         booking = db.fetchone()
-        if (email == booking['email']
-            or name == booking['name']
-            ):
-            cmd = "UPDATE `ucas.applicants`" \
-                + "SET `name`=%s, `email`=%s WHERE `ucasid`=%s"
-            db.execute(cmd, (name, email, ucasid,))
+        if not booking: 
+            cmd = "SELECT * FROM `ucas.slots` WHERE `nspaces` GT 0"
+            slots = db.execute(cmd)
+            return template('signup', error="booking-update", slots=slots)
+
         else:
-            return template('signup', 
-                            error="edit-booking-nomatch", slots=slots)
-                           
-    return redirect('/signup/%s' % (ucasid,))
+            cmd = "UPDATE `ucas.slots` "\
+                + "SET `spaces` = `spaces`+1 WHERE `slotid`=%s"
+            db.execute(cmd, (booking['slotid'],))
+            
+            cmd = "UPDATE `ucas.slots` "\
+                + "SET `spaces` = `spaces`-1 WHERE `slotid`=%s"
+            db.execute(cmd, (slotid,))
+
+            cmd = "UPDATE `ucas.bookings` "\
+                + "SET `email`=%s, `slotid`=%s "\
+                + "WHERE `ucasid`=%s AND `name`=%s"
+            db.execute(cmd, (email, slotid, ucasid, name))
+
+    from urllib import quote as urlquote
+    return redirect('/signup/%s/%s' % (urlquote(ucasid), urlquote(name)))
 
 if __name__ == '__main__':
     bottle.run(app, host='localhost', port=8080, reloader=True, debug=True)

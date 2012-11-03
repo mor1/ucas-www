@@ -22,8 +22,9 @@
           <legend>Available slots</legend>
 %for slot in slots:
           <label>
-            <input type="radio" name="slot" value="{{ slot['value'] }}" />  
-            {{ slot['display'] }}
+            <input type="radio" name="slotid" value="{{ slot['slotid'] }}" />
+            {{ slot['slot'] }}
+            {{ slot['spaces'] }}
           </label>
 %end
         </fieldset>
@@ -33,4 +34,4 @@
   </fieldset>
 </form>
 
-%rebase layout title="Sign-up",error=error
+%rebase layout title="Sign-up", error=error

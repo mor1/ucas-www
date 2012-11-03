@@ -17,7 +17,6 @@
   <a href="/signup">Sign-up for a slot</a>
 </p>
 
-%if ((not ucasid) or (ucasid and error)):
 <form method="post">
   <fieldset>
     <legend>Enter your UCAS Id and either name or email to retrieve an existing booking</legend>
@@ -28,7 +27,7 @@
       </li>
       <li>
         <label for="name">Name</label>
-        <input type="text" name="name" />
+        <input type="text" name="name" required />
       </li>
       <li>
         <label for="email">Email</label>
@@ -38,7 +37,6 @@
     <input type="submit" value="retrieve booking" />
   </fieldset>
 </form>
-%end
 
 %if booking:
 <div id="booking">
@@ -54,6 +52,10 @@
     <li>
       <label for="email">Email</label>
       <span id="email">{{ booking['email'] }}</span>
+    </li>
+    <li>
+      <label for="slotid">SlotId</label>
+      <span id="slotid">{{ booking['slotid'] }}</span>
     </li>
   </ol>
 </div>
