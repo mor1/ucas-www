@@ -44,28 +44,34 @@ app.install(plugin)
 def root(): 
     '''Entry page, permitting booking retrieval.'''
 
-    return template('root', booking=None, error=None, ucasid=None)
+    return template('root', error=None, booking=None, ucasid=None)
 
 @app.post('/')
-@app.get('/signup/<ucasid:re:[0-9]+>')
+@app.get('/signup/<ucasid:re:[0-9]{3}-[0-9]{3}-[0-9]{4}>')
 def retrieve_booking(db, ucasid=None):
     '''Retrieve existing booking, indexed by UCAS ID.'''
 
     booking = error = None
     if not ucasid:
         ucasid = request.forms.ucasid
-    print "UCASID", ucasid
-
-    n = db.execute(
-        'SELECT * FROM `ucas.applicants` WHERE `ucasid`="%s"' 
-        % (ucasid, ))
+    name = request.forms.name
+    email = request.forms.email
+        
+    cmd = "SELECT * FROM `ucas.applicants` WHERE `ucasid`=%s"
+    n = db.execute(cmd, (ucasid,))
     if n == 1: 
         booking = db.fetchone()
-        if not booking: error = "booking"
+        if not booking: 
+            error = "booking"
+        print booking
+        if booking['name'] != name and booking['email'] != email:
+            error = "booking-mismatch"
+            booking = None
+    
     else:
-        error = "unknown-booking"
+        error = "unknown-ucasid"
 
-    return template('root', booking=booking, error=error, ucasid=ucasid)
+    return template('root', error=error, booking=booking, ucasid=ucasid)
 
 @app.get('/<filename:path>')
 def static(filename): 
@@ -81,15 +87,39 @@ def signup(db):
     
     slots = [ { 'value':'v', 'display':'d', },
               ]
-    return template('signup', slots=slots)
+    return template('signup', error=None, slots=slots)
 
 @app.post('/signup')
 def do_signup(db):
     '''Create booking.'''
 
-    ucasid = request.forms.ucasid
-    return redirect('/signup/%s' % (ucasid,))
+    error = None
+    slots = [ { 'value':'v', 'display':'d', },
+              ]
 
+    ucasid = request.forms.ucasid
+    name = request.forms.name
+    email = request.forms.email
+    print ucasid, name, email
+
+    cmd = "SELECT * FROM `ucas.applicants` WHERE `ucasid`=%s"
+    n = db.execute(cmd, (ucasid,))
+    if n == 0:
+        cmd = "INSERT INTO `ucas.applicants` VALUES (%s, %s, %s)"
+        db.execute(cmd, (ucasid, name, email,))
+    else:
+        booking = db.fetchone()
+        if (email == booking['email']
+            or name == booking['name']
+            ):
+            cmd = "UPDATE `ucas.applicants`" \
+                + "SET `name`=%s, `email`=%s WHERE `ucasid`=%s"
+            db.execute(cmd, (name, email, ucasid,))
+        else:
+            return template('signup', 
+                            error="edit-booking-nomatch", slots=slots)
+                           
+    return redirect('/signup/%s' % (ucasid,))
 
 if __name__ == '__main__':
     bottle.run(app, host='localhost', port=8080, reloader=True, debug=True)
