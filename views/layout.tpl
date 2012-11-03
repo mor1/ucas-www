@@ -8,6 +8,14 @@
   </head>
 
   <body>
+    <div id="header">
+      %include header title='{{ title }}'
+    </div>
+    
     %include
+    
+    <div id="footer">
+      %include footer title='{{ title }}'
+    </div>
   </body>
 </html>

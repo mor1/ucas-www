@@ -1,5 +1,5 @@
 %# 
-<form>
+<form method="post">
   <fieldset>
     <legend>
       Enter your details and select a slot.
@@ -13,6 +13,10 @@
       <li>
         <label for="name">Name</label>
         <input type="text" name="name" />
+      </li>
+      <li>
+        <label for="email">Contact Email</label>
+        <input type="text" name="email" />
       </li>
       <li>
         <fieldset>

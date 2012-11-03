@@ -24,13 +24,12 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-
 import ConfigParser
 Config = ConfigParser.ConfigParser()
 Config.read('ucas.ini')
 
 import bottle, bottle_mysql
-from bottle import route, run, template
+from bottle import request, template, redirect
 
 app = bottle.Bottle()
 plugin = bottle_mysql.Plugin(
@@ -41,47 +40,56 @@ plugin = bottle_mysql.Plugin(
     )
 app.install(plugin)
 
-# @app.route('/hello/:name<:re:/?>')
-# def index(name='World'):
-#     return template('<b>Hello {{name}}</b>!', name=name)
-
-# @app.route('/dbtest/:item<:re:/?>')
-# def dbtest(db, item):
-#     n = db.execute('SELECT * from `ucas.applicants` where `ucasid` like "test-%"')
-#     print n
-#     row = db.fetchone()
-#     if row:
-#         return template('showitem', item=row)
-#     return bottle.HTTPError(404, "Page not found")
-
 @app.get('/')
-def root(): return template('root')
+def root(): 
+    '''Entry page, permitting booking retrieval.'''
+
+    return template('root', booking=None, error=None, ucasid=None)
+
+@app.post('/')
+@app.get('/signup/<ucasid:re:[0-9]+>')
+def retrieve_booking(db, ucasid=None):
+    '''Retrieve existing booking, indexed by UCAS ID.'''
+
+    booking = error = None
+    if not ucasid:
+        ucasid = request.forms.ucasid
+    print "UCASID", ucasid
+
+    n = db.execute(
+        'SELECT * FROM `ucas.applicants` WHERE `ucasid`="%s"' 
+        % (ucasid, ))
+    if n == 1: 
+        booking = db.fetchone()
+        if not booking: error = "booking"
+    else:
+        error = "unknown-booking"
+
+    return template('root', booking=booking, error=error, ucasid=ucasid)
+
 @app.get('/<filename:path>')
 def static(filename): 
+    '''Retrieve static resource.'''
+
     if filename in ('favicon.ico', 'robots.txt', 'css/ucas.css', ):
         return bottle.static_file(filename, root='./static')
     return bottle.HTTPError(404, "Page not found")            
 
 @app.get('/signup')
 def signup(db):
+    '''Display signup form.'''
+    
     slots = [ { 'value':'v', 'display':'d', },
               ]
     return template('signup', slots=slots)
 
 @app.post('/signup')
 def do_signup(db):
-    return template('signedup')
+    '''Create booking.'''
 
-@app.get('/signup/<ucasid:re:[0-9-]+>')
-def get_signup(db, ucasid=None):
-    n = db.execute(
-        'SELECT * FROM `ucas.applicants` WHERE `ucasid` LIKE "%s"' 
-        % (ucasid, ))
-    if n == 0: return template('signup-error')
+    ucasid = request.forms.ucasid
+    return redirect('/signup/%s' % (ucasid,))
 
-    row = db.fetchone()
-    if not row: return template('signup-error')
-    return template('signup-details', entry=row)
 
 if __name__ == '__main__':
-    run(app, host='localhost', port=8080, reloader=True, debug=True)
+    bottle.run(app, host='localhost', port=8080, reloader=True, debug=True)
