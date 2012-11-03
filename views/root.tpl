@@ -19,7 +19,7 @@
 
 <form method="post">
   <fieldset>
-    <legend>Enter your UCAS Id and either name or email to retrieve an existing booking</legend>
+    <legend>Enter your UCAS Id and name to retrieve your booking</legend>
     <ol>
       <li>
         <label for="ucasid">UCAS Id</label>
@@ -28,10 +28,6 @@
       <li>
         <label for="name">Name</label>
         <input type="text" name="name" required />
-      </li>
-      <li>
-        <label for="email">Email</label>
-        <input type="text" name="email" />
       </li>
     </ol>
     <input type="submit" value="retrieve booking" />

@@ -80,7 +80,9 @@ def static(filename):
 def signup(db):
     '''Display signup form.'''
     
-    cmd = "SELECT * FROM `ucas.slots` WHERE `spaces` > 0"
+    cmd = "SELECT * FROM `ucas.slots` "\
+        + "WHERE `spaces` > 0 "\
+        + "ORDER BY `slot`,`spaces` DESC"
     db.execute(cmd)
     return template('signup', error=None, slots=db.fetchall())
 
@@ -99,16 +101,25 @@ def do_signup(db):
     n = db.execute(cmd, (ucasid, name))
     if n == 0:
         cmd = "UPDATE `ucas.slots` "\
-            + "SET `spaces` = `spaces`-1 WHERE `slotid`=%s"
-        db.execute(cmd, (slotid,))
-        
+            + "SET `spaces` = `spaces`-1 WHERE `slotid`=%s AND `spaces`>0"
+        n = db.execute(cmd, (slotid,))
+        if n != 1:
+            cmd = "SELECT * FROM `ucas.slots` "\
+                + "WHERE `spaces` > 0 "\
+                + "ORDER BY `slot`,`spaces` DESC"
+            db.execute(cmd)
+            slots = db.fetchall()
+            return template('signup', error="booking-slot-death", slots=slots)
+
         cmd = "INSERT INTO `ucas.bookings` VALUES (%s, %s, %s, %s)"
         db.execute(cmd, (ucasid, name, email, slotid,))
         
     else:
         booking = db.fetchone()
         if not booking: 
-            cmd = "SELECT * FROM `ucas.slots` WHERE `nspaces` GT 0"
+            cmd = "SELECT * FROM `ucas.slots` "\
+                + "WHERE `spaces` > 0 "\
+                + "ORDER BY `slot`,`spaces` DESC"
             slots = db.execute(cmd)
             return template('signup', error="booking-update", slots=slots)
 
@@ -118,7 +129,8 @@ def do_signup(db):
             db.execute(cmd, (booking['slotid'],))
             
             cmd = "UPDATE `ucas.slots` "\
-                + "SET `spaces` = `spaces`-1 WHERE `slotid`=%s"
+                + "SET `spaces` = `spaces`-1 "\
+                + "WHERE `slotid`=%s AND `spaces`>0"
             db.execute(cmd, (slotid,))
 
             cmd = "UPDATE `ucas.bookings` "\

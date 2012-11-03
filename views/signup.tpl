@@ -1,3 +1,8 @@
+%if len(slots) == 0:
+<p>
+  Sorry! No remaining slots.
+</p>
+%else:
 <form method="post">
   <fieldset>
     <legend>
@@ -20,10 +25,18 @@
       <li>
         <fieldset>
           <legend>Available slots</legend>
-%for slot in slots:
+          <label>
+            <input type="radio" name="slotid" required checked
+                   value="{{ slots[0]['slotid'] }}" />
+            {{ slots[0]['slot'] }}
+            {{ slots[0]['staffid'] }}
+            {{ slots[0]['spaces'] }}
+          </label>
+%for slot in slots[1:]:
           <label>
             <input type="radio" name="slotid" value="{{ slot['slotid'] }}" />
             {{ slot['slot'] }}
+            {{ slot['staffid'] }}
             {{ slot['spaces'] }}
           </label>
 %end
@@ -33,5 +46,6 @@
     <input type="submit" value="Submit" />
   </fieldset>
 </form>
+%end
 
 %rebase layout title="Sign-up", error=error
