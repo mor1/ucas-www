@@ -4,5 +4,8 @@ host: hostname
 port: portno
 
 [database]
-dbfile: dbfilename
+host: hostname
+user: user
+pass: pass
+name: dbname
 
