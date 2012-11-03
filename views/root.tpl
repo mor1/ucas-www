@@ -8,7 +8,7 @@
 <p>
   This is the sign-up site for applicants visiting UCAS days who wish to take
   part in a small group discussion with a member of staff. We will record your
-  UCAS ID, your name, and a contact email address (optional) against the slot
+  UCAS Id, your name, and a contact email address (optional) against the slot
   for which you sign up. Slots are allocated on a first-come first-served
   basis.
 </p>
@@ -20,7 +20,7 @@
 %if ((not ucasid) or (ucasid and error)):
 <form method="post">
   <fieldset>
-    <legend>Enter your UCAS ID and either name or email to retrieve an existing booking</legend>
+    <legend>Enter your UCAS Id and either name or email to retrieve an existing booking</legend>
     <ol>
       <li>
         <label for="ucasid">UCAS Id</label>
@@ -42,9 +42,20 @@
 
 %if booking:
 <div id="booking">
-  <span id="ucasid">{{ booking['ucasid'] }}</span>
-  <span id="name">{{ booking['name'] }}</span>
-  <span id="email">{{ booking['email'] }}</span>
+  <ol>
+    <li>
+      <label for="ucasid">UCAS Id</label>
+      <span id="ucasid">{{ booking['ucasid'] }}</span>
+    </li>
+    <li>
+      <label for="name">Name</label>
+      <span id="name">{{ booking['name'] }}</span>
+    </li>
+    <li>
+      <label for="email">Email</label>
+      <span id="email">{{ booking['email'] }}</span>
+    </li>
+  </ol>
 </div>
 %end
 
