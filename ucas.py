@@ -55,8 +55,12 @@ app.install(plugin)
 #     return bottle.HTTPError(404, "Page not found")
 
 @app.get('/')
-def root():
-    bottle.redirect('/signup')
+def root(): return template('root')
+@app.get('/<filename:path>')
+def static(filename): 
+    if filename in ('favicon.ico', 'robots.txt', 'css/ucas.css', ):
+        return bottle.static_file(filename, root='./static')
+    return bottle.HTTPError(404, "Page not found")            
 
 @app.get('/signup')
 def signup(db):
