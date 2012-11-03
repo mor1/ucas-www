@@ -1,5 +1,7 @@
 # Simple web app
 
+## UNDER DEVELOPMENT. INCOMPLETE. 
+
 Implements a simple web app for signups to UCAS open day small group discussions. Built on Python2.7 using bottle.py, and connected to the School of Computer Science webserver using AJP via flup.
 
 ## Dependencies
