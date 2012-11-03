@@ -33,4 +33,4 @@
   </fieldset>
 </form>
 
-%rebase layout title="Sign-up"
+%rebase layout title="Sign-up",error=error
