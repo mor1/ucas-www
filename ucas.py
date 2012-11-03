@@ -42,22 +42,21 @@ plugin = bottle_mysql.Plugin(
     )
 app.install(plugin)
 
-@app.get('/')
-def root(): 
-    '''Entry page, permitting booking retrieval.'''
-
-    return template('root', error=None, booking=None)
-
 @app.post('/')
-@app.get('/signup/<ucasid:re:[0-9]{3}-[0-9]{3}-[0-9]{4}>/<name>')
+@app.get('/')
 def retrieve_booking(db, ucasid=None, name=None):
     '''Retrieve existing booking, indexed by <ucasid> and <name>.'''
 
-    booking = error = None
-    
+    booking = error = ucasid = None
     if request.method == "POST":
         ucasid = request.forms.ucasid
         name = request.forms.name
+    else:
+        ucasid = request.query.ucasid
+        name = request.query.name
+    
+    if not ucasid: # Entry page, permitting booking retrieval
+        return template('root', error=None, booking=None)
     
     cmd = "SELECT * FROM `ucas.bookings` WHERE `ucasid`=%s AND `name`=%s"
     n = db.execute(cmd, (ucasid, name))
@@ -138,8 +137,8 @@ def do_signup(db):
                 + "WHERE `ucasid`=%s AND `name`=%s"
             db.execute(cmd, (email, slotid, ucasid, name))
 
-    from urllib import quote as urlquote
-    return redirect('/signup/%s/%s' % (urlquote(ucasid), urlquote(name)))
+    from urllib import urlencode
+    return redirect('/?%s' % (urlencode({'ucasid':ucasid, 'name':name }),))
 
 if __name__ == '__main__':
     bottle.run(app, host='localhost', port=8080, reloader=True, debug=True)
