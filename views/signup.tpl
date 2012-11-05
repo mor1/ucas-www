@@ -26,18 +26,24 @@
         <fieldset>
           <legend>Available slots</legend>
           <label>
-            <input type="radio" name="slotid" required checked
-                   value="{{ slots[0]['slotid'] }}" />
+            <input type="radio" name="slotid" value="{{ slots[0]['slotid'] }}"
+                   required checked />
             {{ slots[0]['slot'] }}
+            {{ slots[0]['name'] }}
             {{ slots[0]['staffid'] }}
             {{ slots[0]['spaces'] }}
+            {{ slots[0]['modules'] }}
+            {{ slots[0]['research'] }}
           </label>
 %for slot in slots[1:]:
           <label>
             <input type="radio" name="slotid" value="{{ slot['slotid'] }}" />
             {{ slot['slot'] }}
+            {{ slot['name'] }}
             {{ slot['staffid'] }}
             {{ slot['spaces'] }}
+            {{ slot['modules'] }}
+            {{ slot['research'] }}
           </label>
 %end
         </fieldset>

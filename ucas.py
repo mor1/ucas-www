@@ -83,7 +83,24 @@ def signup(db):
         + "WHERE `spaces` > 0 "\
         + "ORDER BY `slot`,`spaces` DESC"
     db.execute(cmd)
-    return template('signup', error=None, slots=db.fetchall())
+    slots = db.fetchall()
+
+    cmd = "SELECT * FROM `ucas.staff`"
+    db.execute(cmd)
+    staff = db.fetchall()
+    staff = dict([ (s['staffid'],s) for s in staff ])
+
+    for slot in slots:
+        sid = slot['staffid']
+        if sid not in staff: 
+            print "MISSING STAFF MEMBER", sid
+            continue
+
+        slot['modules'] = staff[sid]['modules']
+        slot['research'] = staff[sid]['research']
+        slot['name'] = staff[sid]['name']
+
+    return template('signup', error=None, slots=slots)
 
 @app.post('/signup')
 def do_signup(db):
