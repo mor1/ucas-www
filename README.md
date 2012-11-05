@@ -11,5 +11,3 @@ Python 2.7 and associated libraries:
     $ pip install flup mysql-python bottle bottle-mysql
     
 Of course, bottle.py is a single-file web framework so could simply be copied directly into the relevant directory.
-
-
