@@ -93,14 +93,11 @@ create table if not exists `rmm`.`ucas.slots` (
 insert into `rmm`.`ucas.staff` 
   (staffid, name, email, research, modules)
 values
-  ("bsl", "Brian Logan", "bsl@cs.nott.ac.uk", "Artificial intelligence",
-            "G52APT, G54DIA"),
-  ("nhn", "Henrik Nilsson", "nhn@cs.nott.ac.uk", "Programming languages",
-            "G51FUN"),
-  ("srb", "Steve Bagley", "srb@cs.nott.ac.uk", "Document engineering",
-            "G51PRG, G53DOC"),
+  ("bsl", "Brian Logan", "bsl@cs.nott.ac.uk", "Artificial intelligence", "G52APT, G54DIA"),
+  ("nhn", "Henrik Nilsson", "nhn@cs.nott.ac.uk", "Programming languages", "G51FUN"),
+  ("srb", "Steve Bagley", "srb@cs.nott.ac.uk", "Document engineering", "G51PRG, G53DOC"),
   ("bnk", "Boriana Koleva", "bnk@cs.nott.ac.uk", "Human computer interaction",
-            "G51WPS")
+        "G51WPS")
 """)
 
         db.commit()
