@@ -160,7 +160,8 @@ def do_signup(db):
                 'signup', root=ROOT, error="booking-update", slots=slots)
 
     from urllib import urlencode
-    return redirect('/?%s' % (urlencode({'ucasid':ucasid, 'name':name }),))
+    return redirect('%s?%s' % (
+            ROOT, urlencode({'ucasid':ucasid, 'name':name }),))
 
 if __name__ == '__main__':
     bottle.run(app, host='localhost', port=8080, reloader=True, debug=True)
