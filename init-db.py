@@ -101,12 +101,12 @@ create table if not exists `rmm`.`ucas.bookings` (
     if Add_for_Nov21:
         print dbc.execute("""
 insert into `rmm`.`ucas.staff` 
-  (staffid, name, email, research, modules)
+  (staffid, staffname, email, research, modules)
 values
-  ("bsl", "Brian Logan", "bsl@cs.nott.ac.uk", "Artificial intelligence", "G52APT, G54DIA"),
-  ("nhn", "Henrik Nilsson", "nhn@cs.nott.ac.uk", "Programming languages", "G51FUN"),
-  ("srb", "Steve Bagley", "srb@cs.nott.ac.uk", "Document engineering", "G51PRG, G53DOC"),
-  ("bnk", "Boriana Koleva", "bnk@cs.nott.ac.uk", "Human computer interaction",
+  ("bsl", "Brian Logan", "bsl@cs.nott.ac.uk", "Artificial Intelligence", "G52APT, G54DIA"),
+  ("nhn", "Henrik Nilsson", "nhn@cs.nott.ac.uk", "Programming Languages", "G51FUN"),
+  ("srb", "Steve Bagley", "srb@cs.nott.ac.uk", "Document Engineering", "G51PRG, G53DOC"),
+  ("bnk", "Boriana Koleva", "bnk@cs.nott.ac.uk", "Human Computer Interaction",
         "G51WPS")
 """)
 
