@@ -50,8 +50,24 @@
       <span id="email">{{ booking['email'] }}</span>
     </li>
     <li>
-      <label for="slotid">SlotId</label>
-      <span id="slotid">{{ booking['slotid'] }}</span>
+      <label for="slot">Slot</label>
+      <span id="slot">{{ booking['slot'] }}</span>
+    </li>
+    <li>
+      <label for="room">Room</label>
+      <span id="room">{{ booking['room'] }}</span>
+    </li>
+    <li>
+      <label for="staffname">Staffname</label>
+      <span id="staffname">{{ booking['staffname'] }}</span>
+    </li>
+    <li>
+      <label for="research">Research</label>
+      <span id="research">{{ booking['research'] }}</span>
+    </li>
+    <li>
+      <label for="modules">Modules</label>
+      <span id="modules">{{ booking['modules'] }}</span>
     </li>
   </ol>
 </div>

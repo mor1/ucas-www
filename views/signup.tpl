@@ -28,22 +28,26 @@
           <label>
             <input type="radio" name="slotid" value="{{ slots[0]['slotid'] }}"
                    required checked />
-            {{ slots[0]['slot'] }}
-            {{ slots[0]['name'] }}
-            {{ slots[0]['staffid'] }}
-            {{ slots[0]['spaces'] }}
-            {{ slots[0]['modules'] }}
-            {{ slots[0]['research'] }}
+            <ol>
+              <li>{{ slots[0]['slot'] }}</li>
+              <li>{{ slots[0]['staffname'] }}</li>
+              <li>{{ slots[0]['staffid'] }}</li>
+              <li>{{ slots[0]['spaces'] }}</li>
+              <li>{{ slots[0]['modules'] }}</li>
+              <li>{{ slots[0]['research'] }}</li>
+            </ol>
           </label>
 %for slot in slots[1:]:
           <label>
             <input type="radio" name="slotid" value="{{ slot['slotid'] }}" />
-            {{ slot['slot'] }}
-            {{ slot['name'] }}
-            {{ slot['staffid'] }}
-            {{ slot['spaces'] }}
-            {{ slot['modules'] }}
-            {{ slot['research'] }}
+            <ol>
+              <li>{{ slot['slot'] }}</li>
+              <li>{{ slot['staffname'] }}</li>
+              <li>{{ slot['staffid'] }}</li>
+              <li>{{ slot['spaces'] }}</li>
+              <li>{{ slot['modules'] }}</li>
+              <li>{{ slot['research'] }}</li>
+            </ol>
           </label>
 %end
         </fieldset>

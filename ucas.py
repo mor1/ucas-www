@@ -30,6 +30,13 @@ Config.read('ucas.ini')
 
 STATIC_FILES = ('favicon.ico', 'robots.txt', 'css/ucas.css', )
 
+SLOTS_SQL = "SELECT `ucas.slots`.*, `ucas.staff`.* "\
+    + "  FROM `ucas.slots` "\
+    + "  INNER JOIN `ucas.staff` "\
+    + "  ON `ucas.slots`.staffid = `ucas.staff`.staffid "\
+    + "  WHERE `ucas.slots`.spaces > 0 "\
+    + "  ORDER BY `ucas.slots`.slot, `ucas.slots`.spaces DESC"
+
 import bottle, bottle_mysql
 from bottle import request, template, redirect
 
@@ -58,7 +65,13 @@ def retrieve_booking(db, ucasid=None, name=None):
     if not ucasid: # Entry page, permitting booking retrieval
         return template('root', error=None, booking=None)
     
-    cmd = "SELECT * FROM `ucas.bookings` WHERE `ucasid`=%s AND `name`=%s"
+    cmd = "SELECT `ucas.bookings`.*, `ucas.slots`.*, `ucas.staff`.* "\
+        + "  FROM `ucas.bookings` "\
+        + "  INNER JOIN `ucas.slots` "\
+        + "    ON `ucas.bookings`.slotid = `ucas.slots`.slotid "\
+        + "  INNER JOIN `ucas.staff` "\
+        + "    ON `ucas.slots`.staffid = `ucas.staff`.staffid "\
+        + "  WHERE `ucas.bookings`.ucasid = %s AND `ucas.bookings`.name = %s"
     n = db.execute(cmd, (ucasid, name))
     if n != 1: error = "booking-mismatch"
     else:
@@ -79,26 +92,8 @@ def static(filename):
 def signup(db):
     '''Display signup form.'''
     
-    cmd = "SELECT * FROM `ucas.slots` "\
-        + "WHERE `spaces` > 0 "\
-        + "ORDER BY `slot`,`spaces` DESC"
-    db.execute(cmd)
+    db.execute(SLOTS_SQL)
     slots = db.fetchall()
-
-    cmd = "SELECT * FROM `ucas.staff`"
-    db.execute(cmd)
-    staff = db.fetchall()
-    staff = dict([ (s['staffid'],s) for s in staff ])
-
-    for slot in slots:
-        sid = slot['staffid']
-        if sid not in staff: 
-            print "MISSING STAFF MEMBER", sid
-            continue
-
-        slot['modules'] = staff[sid]['modules']
-        slot['research'] = staff[sid]['research']
-        slot['name'] = staff[sid]['name']
 
     return template('signup', error=None, slots=slots)
 
@@ -120,10 +115,7 @@ def do_signup(db):
             + "SET `spaces` = `spaces`-1 WHERE `slotid`=%s AND `spaces`>0"
         n = db.execute(cmd, (slotid,))
         if n != 1:
-            cmd = "SELECT * FROM `ucas.slots` "\
-                + "WHERE `spaces` > 0 "\
-                + "ORDER BY `slot`,`spaces` DESC"
-            db.execute(cmd)
+            db.execute(SLOTS_SQL)
             slots = db.fetchall()
             return template('signup', error="booking-slot-death", slots=slots)
 
