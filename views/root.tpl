@@ -10,6 +10,19 @@
   <a class="btn btn-primary" href="{{root}}signup">Sign-up for a slot</a>
 </p>
 
+%if booking:
+<div id="booking">
+  <strong>
+    {{ booking['name'] }}
+    <small>&lt;{{ booking['email'] }}&gt;, 
+    UCAS Id {{ booking['ucasid'] }}
+    </small>
+  is booked in at {{ booking['slot'] }}
+  in {{ booking['room'] }}
+  with {{ booking['staffname'] }}
+  </strong>
+</div>
+%else:
 <form class="form-horizontal" method="post">
   <fieldset>
     <legend class="small">
@@ -36,44 +49,5 @@
     </div>
   </div>
 </form>
-
-%if booking:
-<div id="booking">
-  <ul>
-    <li>
-      <label for="ucasid">UCAS Id</label>
-      <span id="ucasid">{{ booking['ucasid'] }}</span>
-    </li>
-    <li>
-      <label for="name">Name</label>
-      <span id="name">{{ booking['name'] }}</span>
-    </li>
-    <li>
-      <label for="email">Email</label>
-      <span id="email">{{ booking['email'] }}</span>
-    </li>
-    <li>
-      <label for="slot">Slot</label>
-      <span id="slot">{{ booking['slot'] }}</span>
-    </li>
-    <li>
-      <label for="room">Room</label>
-      <span id="room">{{ booking['room'] }}</span>
-    </li>
-    <li>
-      <label for="staffname">Staffname</label>
-      <span id="staffname">{{ booking['staffname'] }}</span>
-    </li>
-    <li>
-      <label for="research">Research</label>
-      <span id="research">{{ booking['research'] }}</span>
-    </li>
-    <li>
-      <label for="modules">Modules</label>
-      <span id="modules">{{ booking['modules'] }}</span>
-    </li>
-  </ul>
-</div>
 %end
-
 %rebase layout root=root, breadcrumbs=breadcrumbs, error=error
