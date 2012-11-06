@@ -108,8 +108,8 @@ def do_signup(db):
     email = request.forms.email
     slotid = request.forms.slotid
 
-    cmd = "SELECT * FROM `ucas.bookings` WHERE `ucasid`=%s AND `name`=%s"
-    n = db.execute(cmd, (ucasid, name))
+    cmd = "SELECT * FROM `ucas.bookings` WHERE `ucasid`=%s"
+    n = db.execute(cmd, (ucasid, ))
     if n == 0:
         cmd = "UPDATE `ucas.slots` "\
             + "SET `spaces` = `spaces`-1 WHERE `slotid`=%s AND `spaces`>0"
@@ -124,14 +124,10 @@ def do_signup(db):
         
     else:
         booking = db.fetchone()
-        if not booking: 
-            cmd = "SELECT * FROM `ucas.slots` "\
-                + "WHERE `spaces` > 0 "\
-                + "ORDER BY `slot`,`spaces` DESC"
-            slots = db.execute(cmd)
-            return template('signup', error="booking-update", slots=slots)
-
-        else:
+        if (booking
+            and ((len(name) > 0 and booking['name'] == name)
+                 or (len(email) > 0 and booking['email'] == email)
+                 )):
             cmd = "UPDATE `ucas.slots` "\
                 + "SET `spaces` = `spaces`+1 WHERE `slotid`=%s"
             db.execute(cmd, (booking['slotid'],))
@@ -142,9 +138,14 @@ def do_signup(db):
             db.execute(cmd, (slotid,))
 
             cmd = "UPDATE `ucas.bookings` "\
-                + "SET `email`=%s, `slotid`=%s "\
-                + "WHERE `ucasid`=%s AND `name`=%s"
-            db.execute(cmd, (email, slotid, ucasid, name))
+                + "SET `name`=%s, `email`=%s, `slotid`=%s "\
+                + "WHERE `ucasid`=%s AND (`name`=%s OR `email`=%s)"
+            db.execute(cmd, (name, email, slotid, ucasid, name, email))
+
+        else:
+            db.execute(SLOTS_SQL)
+            slots = db.fetchall()
+            return template('signup', error="booking-update", slots=slots)
 
     from urllib import urlencode
     return redirect('/?%s' % (urlencode({'ucasid':ucasid, 'name':name }),))
