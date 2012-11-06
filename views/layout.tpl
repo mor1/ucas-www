@@ -2,7 +2,7 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="description" content="UCAS small group discussion sign-up" />
+    <meta name="description" content="UCAS Group Discussion Sign-up" />
     <meta name="author" content="Richard Mortier" />
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     
@@ -13,7 +13,7 @@
         <![endif]-->
 
     <link rel="stylesheet" media="screen" type="text/css" 
-          href="/css/ucas.css" 
+          href="{{ root }}css/ucas.css" 
           />
     
     <!-- google analytics async -->
@@ -34,19 +34,63 @@ _gaq.push(['_trackPageview']);
     </script>
     
     <title>
-      {{title or 'No title'}}
+      UCAS Discussion Group Sign-up
     </title>
   </head>
 
   <body>
-    <div id="header">
-      %include header title='{{ title }}'
+    <div class="navbar navbar-inverse navbar-static-top">
+      <div class="navbar-inner">
+        <div class="container-fluid">
+          <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+
+          <a class="brand" href="{{ root }}">
+            UCAS Discussion Group Sign-up
+          </a>
+
+        </div>
+      </div>
     </div>
-    
-    %include
-    
-    <div id="footer">
-      %include footer error=error
+
+    <div class="container-fluid">
+          <ul class="breadcrumb">
+%for bc in breadcrumbs[:-1]:
+            <li>
+              <a href="{{ bc['l'] }}">{{ bc['s'] }}</a> 
+              <span class="divider">/</span>
+            </li>
+%end
+            <li class="active">{{ breadcrumbs[-1]['s'] }}</li>
+          </ul>
+
+      %include
+
+      <footer>
+%if defined('error') and error:
+        <div id="error">
+          <p>
+            ERROR! {{ error }}
+          </p>
+        </div>
+%end
+        <div class="well well-small muted">
+          <div id="contact">
+            Please contact <a href="mailto:admissions@cs.nott.ac.uk">
+            admissions@cs.nott.ac.uk</a> if you have any questions. Please
+            contact <a href="mailto:richard.mortier@nottingham.ac.uk">
+            richard.mortier@nottingham.ac.uk</a> if you experience any
+            problems with this website.
+            <span class="pull-right">
+              Copyright &copy; 2012, Richard Mortier.
+            </span>
+            <p> </p>
+          </div>
+        </div>
+      </footer>
     </div>
   </body>
 </html>

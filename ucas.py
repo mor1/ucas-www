@@ -28,7 +28,8 @@ import ConfigParser
 Config = ConfigParser.ConfigParser()
 Config.read('ucas.ini')
 
-STATIC_FILES = ('favicon.ico', 'robots.txt', 'css/ucas.css', )
+ROOT = Config.get("server", "root")
+STATIC_FILES = ('favicon.ico', 'robots.txt', 'css/ucas.css',)
 
 SLOTS_SQL = "SELECT `ucas.slots`.*, `ucas.staff`.* "\
     + "  FROM `ucas.slots` "\
@@ -54,6 +55,8 @@ app.install(plugin)
 def retrieve_booking(db, ucasid=None, name=None):
     '''Retrieve existing booking, indexed by <ucasid> and <name>.'''
 
+    bcs = [{ 's': "Home", 'l': ROOT, }]
+                                     
     booking = error = ucasid = None
     if request.method == "POST":
         ucasid = request.forms.ucasid
@@ -63,7 +66,8 @@ def retrieve_booking(db, ucasid=None, name=None):
         name = request.query.name
     
     if not ucasid: # Entry page, permitting booking retrieval
-        return template('root', error=None, booking=None)
+        return template('root', 
+                        root=ROOT, breadcrumbs=bcs, error=None, booking=None)
     
     cmd = "SELECT `ucas.bookings`.*, `ucas.slots`.*, `ucas.staff`.* "\
         + "  FROM `ucas.bookings` "\
@@ -78,7 +82,8 @@ def retrieve_booking(db, ucasid=None, name=None):
         booking = db.fetchone()
         if not booking: error = "booking-fetch"
 
-    return template('root', error=error, booking=booking)
+    return template('root', 
+                    root=ROOT, breadcrumbs=bcs, error=error, booking=booking)
 
 @app.get('/<filename:path>')
 def static(filename): 
@@ -92,10 +97,15 @@ def static(filename):
 def signup(db):
     '''Display signup form.'''
     
+    bcs = [{ 's': "Home", 'l': ROOT, },
+           { 's': "Signup", 'l': "/signup" },
+           ]
+
     db.execute(SLOTS_SQL)
     slots = db.fetchall()
 
-    return template('signup', error=None, slots=slots)
+    return template('signup', 
+                    root=ROOT, breadcrumbs=bcs, error=None, slots=slots)
 
 @app.post('/signup')
 def do_signup(db):
@@ -117,7 +127,8 @@ def do_signup(db):
         if n != 1:
             db.execute(SLOTS_SQL)
             slots = db.fetchall()
-            return template('signup', error="booking-slot-death", slots=slots)
+            return template(
+                'signup', root=ROOT, error="booking-slot-death", slots=slots)
 
         cmd = "INSERT INTO `ucas.bookings` VALUES (%s, %s, %s, %s)"
         db.execute(cmd, (ucasid, name, email, slotid,))
@@ -145,7 +156,8 @@ def do_signup(db):
         else:
             db.execute(SLOTS_SQL)
             slots = db.fetchall()
-            return template('signup', error="booking-update", slots=slots)
+            return template(
+                'signup', root=ROOT, error="booking-update", slots=slots)
 
     from urllib import urlencode
     return redirect('/?%s' % (urlencode({'ucasid':ucasid, 'name':name }),))

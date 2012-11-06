@@ -1,42 +1,45 @@
-<h1>
-  UCAS Small Group Discussion Sign-up
-</h1>
-<h2>
-  School of Computer Science, The University of Nottingham
-</h2>
-
 <p>
-  This is the sign-up site for applicants visiting UCAS days who wish to take
-  part in a small group discussion with a member of staff. We will record your
-  UCAS Id, your name, and a contact email address (optional) against the slot
-  for which you sign up. Slots are allocated on a first-come first-served
-  basis.
+  This is the sign-up site for applicants visiting The University of
+  Nottingham School of Computer Science UCAS days who wish to take part in a
+  small group discussion with a member of staff. We will record your UCAS Id,
+  your name, and a contact email address (optional) against the slot for which
+  you sign up. Slots are allocated on a first-come first-served basis.
 </p>
 
 <p>
-  <a href="/signup">Sign-up for a slot</a>
+  <a class="btn btn-primary" href="{{root}}signup">Sign-up for a slot</a>
 </p>
 
-<form method="post">
+<form class="form-horizontal" method="post">
   <fieldset>
-    <legend>Enter your UCAS Id and name to retrieve your booking</legend>
-    <ol>
-      <li>
-        <label for="ucasid">UCAS Id</label>
+    <legend class="small">
+      Enter your UCAS Id and name to retrieve your booking
+    </legend>
+    <div class="control-group">
+      <label class="control-label" for="ucasid">UCAS Id</label>
+      <div class="controls">
         <input type="text" name="ucasid" autofocus required />
-      </li>
-      <li>
-        <label for="name">Name</label>
+      </div>
+    </div>
+    <div class="control-group">
+      <label class="control-label" for="name">Name</label>
+      <div class="controls">
         <input type="text" name="name" required />
-      </li>
-    </ol>
-    <input type="submit" value="retrieve booking" />
+      </div>
+    </div>
   </fieldset>
+  <div class="control-group">
+    <div class="controls">
+      <button type="submit" class="btn">
+        retrieve booking
+      </button>
+    </div>
+  </div>
 </form>
 
 %if booking:
 <div id="booking">
-  <ol>
+  <ul>
     <li>
       <label for="ucasid">UCAS Id</label>
       <span id="ucasid">{{ booking['ucasid'] }}</span>
@@ -69,8 +72,8 @@
       <label for="modules">Modules</label>
       <span id="modules">{{ booking['modules'] }}</span>
     </li>
-  </ol>
+  </ul>
 </div>
 %end
 
-%rebase layout title="UCAS Discussion Group Signup", error=error
+%rebase layout root=root, breadcrumbs=breadcrumbs, error=error

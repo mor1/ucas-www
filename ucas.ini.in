@@ -1,5 +1,5 @@
 [server]
-scriptname: /baseurl
+root: /baseurl
 host: hostname
 port: portno
 
