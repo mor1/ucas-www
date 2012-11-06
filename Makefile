@@ -14,6 +14,6 @@ clean:
 
 deploy:
 	$(MIRROR) . rmm@severn.cs.nott.ac.uk:/lhome/rmm/src/ucas-www
-	ssh rmm@severn.cs.nott.ac.uk \
-		"( cd ~/src/ucas-www &&  \
-			source ~/localpy/bin/activate && make run )"
+#	ssh rmm@severn.cs.nott.ac.uk \
+#		"( cd ~/src/ucas-www &&  \
+#			source ~/localpy/bin/activate && make run )"
