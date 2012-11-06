@@ -32,7 +32,8 @@ import MySQLdb
 
 Create_user = False
 Create_tables = False
-Reset = True
+Really_really = False
+Add_for_Nov21 = False
 
 if __name__ == '__main__':
 
@@ -52,43 +53,52 @@ create database if not exists `rmm`
   character set 'utf8'
   collate 'utf8_unicode_ci'
 """)
-        db.commit()
 
     if Create_tables:
         ## as user
 
-        dbc.execute("""
-create table if not exists `rmm`.`ucas.bookings` (
-  ucasid varchar(32),
-  name varchar(64),
-  email varchar(128),
-  slotid varchar(32)
-)
-""")
+        if Really_really:
+            print dbc.execute("drop table if exists `rmm`.`ucas.bookings`")
+            db.commit()
+            print dbc.execute("drop table if exists `rmm`.`ucas.slots`")
+            db.commit()
+            print dbc.execute("drop table if exists `rmm`.`ucas.staff`")
+            db.commit()
 
-        dbc.execute("""
+        print dbc.execute("""
 create table if not exists `rmm`.`ucas.staff` (
-  staffid varchar(5),
-  name varchar(32),
-  email varchar(128),
+  staffid varchar(5) not null,
+  staffname varchar(32) not null,
+  email varchar(128) not null,
   research varchar(128),
-  modules varchar(64)
+  modules varchar(64),
+  primary key (staffid)
 )
 """)
 
-        dbc.execute("""
+        print dbc.execute("""
 create table if not exists `rmm`.`ucas.slots` (
-  slotid varchar(32),
-  slot datetime,
-  room varchar(16),
-  staffid varchar(5),
-  spaces int default 6
+  slotid int not null auto_increment,
+  slot datetime not null,
+  room varchar(16) not null, 
+  staffid varchar(5) not null,
+  spaces int default 6, 
+  primary key (slotid),
+  foreign key (staffid) references `ucas.staff`(staffid)
 )
 """)
 
-        db.commit()
+        print dbc.execute("""
+create table if not exists `rmm`.`ucas.bookings` (
+  ucasid varchar(32) not null,
+  name varchar(64) not null,
+  email varchar(128),
+  slotid int not null,
+  foreign key (slotid) references `ucas.slots`(slotid)  
+)
+""")
 
-    if Reset:
+    if Add_for_Nov21:
         print dbc.execute("""
 insert into `rmm`.`ucas.staff` 
   (staffid, name, email, research, modules)
@@ -100,4 +110,15 @@ values
         "G51WPS")
 """)
 
-        db.commit()
+        print dbc.execute("""
+insert into `rmm`.`ucas.slots`
+  (slot, room, staffid, spaces)
+values
+  ("2012-11-21 11:00", "C1", "bsl", 8),
+  ("2012-11-21 11:00", "C80", "nhn", 8),
+  ("2012-11-21 11:00", "Exchange", "srb", 8),
+  ("2012-11-21 11:00", "Atrium", "bnk", 8)
+""")
+
+    db.commit()
+
