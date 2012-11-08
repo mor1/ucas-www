@@ -80,8 +80,12 @@ _gaq.push(['_trackPageview']);
         <div class="well well-small muted">
           <div id="contact">
             Please contact <a href="mailto:admissions@cs.nott.ac.uk">
-            admissions@cs.nott.ac.uk</a> if you have any questions. Please
-            contact <a href="mailto:richard.mortier@nottingham.ac.uk">
+            admissions@cs.nott.ac.uk</a> if you have any questions about this
+            process. 
+
+            <br /> 
+
+            Please contact <a href="mailto:richard.mortier@nottingham.ac.uk">
             richard.mortier@nottingham.ac.uk</a> if you experience any
             problems with this website.
           </div>
