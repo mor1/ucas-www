@@ -70,4 +70,4 @@
 </form>
 %end
 
-%rebase layout data=data
+%rebase layout data=data, slots=slots

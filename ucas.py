@@ -50,8 +50,16 @@ plugin = bottle_mysql.Plugin(
     )
 app.install(plugin)
 
-def validate_ucasid(ucasid):
-    return ucasid
+def validate_ucasid(ucasid=None):
+    '''Accept any separators or junk, return properly formatted version.'''
+    
+    if not ucasid: return None
+
+    ds = ''.join([ s for s in ucasid if s.isdigit() ])
+    print "DS", ds, len(ds)
+    if len(ds) != 10: return None
+
+    return "%s-%s-%s" % (ds[0:3], ds[3:6], ds[6:10])
 
 class Data:
     def __init__(self): ## rendering data, with defaults
@@ -129,6 +137,13 @@ def do_signup(db):
     name   = request.forms.name
     email  = request.forms.email
     slotid = request.forms.slotid
+
+    ucasid = validate_ucasid(ucasid)
+    if not ucasid:
+        data.error = "ucasid-validation"
+        db.execute(SLOTS_SQL)
+        slots = db.fetchall()
+        return template("signup", data=data, booking=booking, slots=slots)
 
     cmd = "SELECT * FROM `ucas.bookings` WHERE `ucasid`=%s"
     n = db.execute(cmd, (ucasid, ))
