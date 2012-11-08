@@ -35,17 +35,33 @@
         If you have previously signed up, enter your UCAS Id and name to
         retrieve your booking:
       </p>
-      <div class="control-group">
+      <div class="control-group
+%if data.error and data.error == "booking-mismatch":
+      error
+%end
+      ">
         <label class="control-label" for="ucasid">UCAS Id</label>
         <div class="controls">
           <input type="text" name="ucasid" placeholder="e.g., 123-456-7890"
                  autofocus required />
+          <small>required</small>
+%if data.error and data.error == "booking-mismatch":
+          <span class="help-inline">
+            <i class="icon-warning-sign"></i>
+            details don't match &ndash; please check and retry
+          </span>
+%end
         </div>
       </div>
-      <div class="control-group">
+      <div class="control-group
+%if data.error and data.error == "booking-mismatch":
+      error
+%end
+      ">
         <label class="control-label" for="name">Name</label>
         <div class="controls">
           <input type="text" name="name" required />
+        <small>required</small>
         </div>
       </div>
     </fieldset>

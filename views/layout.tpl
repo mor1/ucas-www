@@ -70,13 +70,6 @@ _gaq.push(['_trackPageview']);
       %include
 
       <footer>
-%if data.error:
-        <div id="error">
-          <p>
-            ERROR! {{ data.error }}
-          </p>
-        </div>
-%end
         <div class="well well-small muted">
           <div id="contact">
             Please contact <a href="mailto:admissions@cs.nott.ac.uk">

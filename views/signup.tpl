@@ -16,19 +16,39 @@
       Enter your details and select a slot:
     </h4>
 
-    <div class="control-group">
+    <div class="control-group 
+%if data.error and data.error == "ucasid-validation":
+      error
+%end
+      ">
       <label class="control-label" for="ucasid">UCAS Id</label>
       <div class="controls">
         <input type="text" name="ucasid" placeholder="e.g., 123-456-7890"
                required autofocus />
         <small>required</small>
+%if data.error and data.error == "ucasid-validation":
+        <span class="help-inline">
+          <i class="icon-warning-sign"></i>
+          invalid UCAS Id &ndash; please check and retry
+        </span>
+%end
       </div>
     </div>    
-    <div class="control-group">
+    <div class="control-group
+%if data.error and data.error == "booking-mismatch":
+      error
+%end
+      ">
       <label class="control-label" for="name">Name</label>
       <div class="controls">
         <input type="text" name="name" required />
         <small>required</small>
+%if data.error and data.error == "booking-mismatch":
+        <span class="help-inline">
+          <i class="icon-warning-sign"></i>
+          details don't match &ndash; please check and retry
+        </span>
+%end
       </div>
     </div>
     <div class="control-group">

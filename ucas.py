@@ -29,7 +29,8 @@ Config = ConfigParser.ConfigParser()
 Config.read('ucas.ini')
 
 ROOT = Config.get("server", "root")
-STATIC_FILES = ('favicon.ico', 'robots.txt', 'css/ucas.css',)
+STATIC_FILES = ('favicon.ico', 'robots.txt', 'css/ucas.css',
+                'img/glyphicons-halflings.png', )
 
 SLOTS_SQL = "SELECT `ucas.slots`.*, `ucas.staff`.* "\
     + "  FROM `ucas.slots` "\
@@ -181,8 +182,11 @@ def do_signup(db):
 
         else:
             db.execute(SLOTS_SQL)
-            data.error = "booking-update"
-            return template('signup', data, slots=db.fetchall())
+            slots = db.fetchall()
+            if not booking: data.error = "booking-fetch"
+            else:
+                data.error = "booking-mismatch"
+            return template('signup', data=data, slots=slots)
 
     from urllib import urlencode
     return redirect('%s?%s' % (
