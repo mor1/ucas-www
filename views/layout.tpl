@@ -13,7 +13,7 @@
         <![endif]-->
 
     <link rel="stylesheet" media="screen" type="text/css" 
-          href="{{ root }}css/ucas.css" 
+          href="{{ data.root }}css/ucas.css" 
           />
     
     <!-- google analytics async -->
@@ -48,7 +48,7 @@ _gaq.push(['_trackPageview']);
             <span class="icon-bar"></span>
           </button>
 
-          <a class="brand" href="{{ root }}">
+          <a class="brand" href="{{ data.root }}">
             UCAS Discussion Group Sign-up
           </a>
 
@@ -58,22 +58,22 @@ _gaq.push(['_trackPageview']);
 
     <div class="container-fluid">
           <ul class="breadcrumb">
-%for bc in breadcrumbs[:-1]:
+%for bc in data.breadcrumbs[:-1]:
             <li>
-              <a href="{{ bc['l'] }}">{{ bc['s'] }}</a> 
+              <a href="{{ bc[1] }}">{{ bc[0] }}</a> 
               <span class="divider">/</span>
             </li>
 %end
-            <li class="active">{{ breadcrumbs[-1]['s'] }}</li>
+            <li class="active">{{ data.breadcrumbs[-1][0] }}</li>
           </ul>
 
       %include
 
       <footer>
-%if defined('error') and error:
+%if data.error:
         <div id="error">
           <p>
-            ERROR! {{ error }}
+            ERROR! {{ data.error }}
           </p>
         </div>
 %end

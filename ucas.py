@@ -50,24 +50,39 @@ plugin = bottle_mysql.Plugin(
     )
 app.install(plugin)
 
+def validate_ucasid(ucasid):
+    return ucasid
+
+class Data:
+    def __init__(self): ## rendering data, with defaults
+        self.root = ROOT
+        self.breadcrumbs = [ ("Home", ROOT,) ]
+        self.error = None
+
 @app.post('/')
 @app.get('/')
 def retrieve_booking(db, ucasid=None, name=None):
     '''Retrieve existing booking, indexed by <ucasid> and <name>.'''
 
-    bcs = [{ 's': "Home", 'l': ROOT, }]
-                                     
-    booking = error = ucasid = None
+    data = Data()
+
+    booking = ucasid = name = None
     if request.method == "POST":
         ucasid = request.forms.ucasid
         name = request.forms.name
     else:
         ucasid = request.query.ucasid
         name = request.query.name
+
+    if not ucasid: 
+        ## entry page, permitting booking retrieval
+        return template('root', data=data, booking=booking)
     
-    if not ucasid: # Entry page, permitting booking retrieval
-        return template('root', 
-                        root=ROOT, breadcrumbs=bcs, error=None, booking=None)
+    ucasid = validate_ucasid(ucasid)
+    if not ucasid:
+        ## mash data.error
+        data.error = "ucasid-validation"
+        return template('root', data=data, booking=booking)
     
     cmd = "SELECT `ucas.bookings`.*, `ucas.slots`.*, `ucas.staff`.* "\
         + "  FROM `ucas.bookings` "\
@@ -77,13 +92,13 @@ def retrieve_booking(db, ucasid=None, name=None):
         + "    ON `ucas.slots`.staffid = `ucas.staff`.staffid "\
         + "  WHERE `ucas.bookings`.ucasid = %s AND `ucas.bookings`.name = %s"
     n = db.execute(cmd, (ucasid, name))
-    if n != 1: error = "booking-mismatch"
+    if n != 1: data.error = "booking-mismatch"
     else:
         booking = db.fetchone()
-        if not booking: error = "booking-fetch"
+        if not booking: data.error = "booking-fetch"
 
-    return template('root', 
-                    root=ROOT, breadcrumbs=bcs, error=error, booking=booking)
+    ## mash data.error
+    return template('root', data=data, booking=booking)
 
 @app.get('/<filename:path>')
 def static(filename): 
@@ -96,26 +111,23 @@ def static(filename):
 @app.get('/signup')
 def signup(db):
     '''Display signup form.'''
-    
-    bcs = [{ 's': "Home", 'l': ROOT, },
-           { 's': "Signup", 'l': "/signup" },
-           ]
+
+    data = Data()
+    data.breadcrumbs.append(("Signup", "/signup"))
 
     db.execute(SLOTS_SQL)
-    slots = db.fetchall()
-
-    return template('signup', 
-                    root=ROOT, breadcrumbs=bcs, error=None, slots=slots)
+    return template('signup', data=data, slots=db.fetchall())
 
 @app.post('/signup')
 def do_signup(db):
     '''Create booking.'''
 
+    data = Data()
     booking = error = None
     
     ucasid = request.forms.ucasid
-    name = request.forms.name
-    email = request.forms.email
+    name   = request.forms.name
+    email  = request.forms.email
     slotid = request.forms.slotid
 
     cmd = "SELECT * FROM `ucas.bookings` WHERE `ucasid`=%s"
@@ -126,9 +138,8 @@ def do_signup(db):
         n = db.execute(cmd, (slotid,))
         if n != 1:
             db.execute(SLOTS_SQL)
-            slots = db.fetchall()
-            return template(
-                'signup', root=ROOT, error="booking-slot-death", slots=slots)
+            data.error = "booking-slot-death"
+            return template('signup', data=data, slots=db.fetchall())
 
         cmd = "INSERT INTO `ucas.bookings` VALUES (%s, %s, %s, %s)"
         db.execute(cmd, (ucasid, name, email, slotid,))
@@ -155,9 +166,8 @@ def do_signup(db):
 
         else:
             db.execute(SLOTS_SQL)
-            slots = db.fetchall()
-            return template(
-                'signup', root=ROOT, error="booking-update", slots=slots)
+            data.error = "booking-update"
+            return template('signup', data, slots=db.fetchall())
 
     from urllib import urlencode
     return redirect('%s?%s' % (

@@ -6,7 +6,9 @@
   </p>
 
   <div>
-    <a class="btn btn-primary" href="{{root}}signup">Sign-up for a slot</a>
+    <a class="btn btn-primary" href="{{ data.root }}signup">
+      Sign-up for a slot
+    </a>
   </div>
 </div>
 
@@ -36,7 +38,8 @@
     <div class="control-group">
       <label class="control-label" for="ucasid">UCAS Id</label>
       <div class="controls">
-        <input type="text" name="ucasid" autofocus required />
+        <input type="text" name="ucasid" placeholder="e.g., 123-456-7890"
+               autofocus required />
       </div>
     </div>
     <div class="control-group">
@@ -57,4 +60,4 @@
 </div>
 %end
 
-%rebase layout root=root, breadcrumbs=breadcrumbs, error=error
+%rebase layout data=data, booking=booking

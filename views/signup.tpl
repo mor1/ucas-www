@@ -19,7 +19,8 @@
     <div class="control-group">
       <label class="control-label" for="ucasid">UCAS Id</label>
       <div class="controls">
-        <input type="text" name="ucasid" required autofocus />
+        <input type="text" name="ucasid" placeholder="e.g., 123-456-7890"
+               required autofocus />
         <small>required</small>
       </div>
     </div>    
@@ -60,12 +61,13 @@
 %end
   </fieldset>
 
+  <hr style="margin-bottom: 0" />
   <div class="control-group">
-    <div class="form-actions">
-      <input type="submit" class="btn btn-block btn-primary" value="Submit" />
+    <div class="form-actions pull-right" style="border-top: none">
+      <input type="submit" class="btn span4 btn-primary" value="Submit" />
     </div>
   </div>
 </form>
 %end
 
-%rebase layout root=root, breadcrumbs=breadcrumbs, error=error
+%rebase layout data=data
