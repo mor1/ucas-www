@@ -7,7 +7,7 @@
 
   <div>
     <a class="btn btn-primary" href="{{ data.root }}signup">
-      Sign-up for a slot
+      sign-up for a slot
     </a>
   </div>
 </div>
@@ -17,10 +17,10 @@
   <strong>
     {{ booking['name'] }}
     <small>
-%   if booking['email']:
-    &lt;{{ booking['email'] }}&gt;, 
-%   end
-    UCAS Id {{ booking['ucasid'] }}
+      %   if booking['email']:
+      &lt;{{ booking['email'] }}&gt;, 
+      %   end
+      UCAS Id {{ booking['ucasid'] }}
     </small>
     is booked in at {{ booking['slot'] }}
     in {{ booking['room'] }}
@@ -34,29 +34,29 @@
       <p>
         If you have previously signed up, enter your UCAS Id and name to
         retrieve your booking:
-    </p>
+      </p>
+      <div class="control-group">
+        <label class="control-label" for="ucasid">UCAS Id</label>
+        <div class="controls">
+          <input type="text" name="ucasid" placeholder="e.g., 123-456-7890"
+                 autofocus required />
+        </div>
+      </div>
+      <div class="control-group">
+        <label class="control-label" for="name">Name</label>
+        <div class="controls">
+          <input type="text" name="name" required />
+        </div>
+      </div>
+    </fieldset>
     <div class="control-group">
-      <label class="control-label" for="ucasid">UCAS Id</label>
       <div class="controls">
-        <input type="text" name="ucasid" placeholder="e.g., 123-456-7890"
-               autofocus required />
+        <button type="submit" class="btn">
+          retrieve booking
+        </button>
       </div>
     </div>
-    <div class="control-group">
-      <label class="control-label" for="name">Name</label>
-      <div class="controls">
-        <input type="text" name="name" required />
-      </div>
-    </div>
-  </fieldset>
-  <div class="control-group">
-    <div class="controls">
-      <button type="submit" class="btn">
-        retrieve booking
-      </button>
-    </div>
-  </div>
-</form>
+  </form>
 </div>
 %end
 
