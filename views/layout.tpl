@@ -84,11 +84,10 @@ _gaq.push(['_trackPageview']);
             contact <a href="mailto:richard.mortier@nottingham.ac.uk">
             richard.mortier@nottingham.ac.uk</a> if you experience any
             problems with this website.
-            <span class="pull-right">
-              Copyright &copy; 2012, Richard Mortier.
-            </span>
-            <p> </p>
           </div>
+        </div>
+        <div class="pull-right">
+          <small>Copyright &copy; 2012, Richard Mortier.</small>
         </div>
       </footer>
     </div>

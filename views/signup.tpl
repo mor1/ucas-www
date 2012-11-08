@@ -1,36 +1,46 @@
+<p>
+  We will record your UCAS Id, your name, and a contact email address
+  (optional) against the slot for which you sign up. Slots are allocated on a
+  first-come first-served basis.
+</p>
+
 %if len(slots) == 0:
 <p>
   Sorry! No remaining slots.
 </p>
 %else:
+<hr />
 <form class="form-horizontal" method="post">
   <fieldset>
-    <legend class="small">
-      Enter your details and select a slot.
-    </legend>
+    <h4>
+      Enter your details and select a slot:
+    </h4>
 
     <div class="control-group">
       <label class="control-label" for="ucasid">UCAS Id</label>
       <div class="controls">
         <input type="text" name="ucasid" required autofocus />
+        <small>required</small>
       </div>
     </div>    
     <div class="control-group">
       <label class="control-label" for="name">Name</label>
       <div class="controls">
         <input type="text" name="name" required />
+        <small>required</small>
       </div>
     </div>
     <div class="control-group">
       <label class="control-label" for="email">Contact Email</label>
       <div class="controls">
         <input type="text" name="email" />
+        <small>optional</small>
       </div>
     </div>
   </fieldset>
 
   <fieldset>
-    <legend>Available slots</legend>
+    <strong>Available slots:</strong>
     <label class="radio">
       <input type="radio" name="slotid" value="{{ slots[0]['slotid'] }}"
              checked />
@@ -40,7 +50,6 @@
       <small>and researches</small> {{ slots[0]['research'] }}
     </label>
 %for slot in slots[1:]:
-    <br />
     <label class="radio">
       <input type="radio" name="slotid" value="{{ slot['slotid'] }}" />
       <small>at</small> {{ slot['slot'] }}
@@ -49,7 +58,6 @@
       <small>and researches</small> {{ slot['research'] }}
     </label>
 %end
-    
   </fieldset>
 
   <div class="control-group">

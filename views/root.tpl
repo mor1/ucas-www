@@ -1,33 +1,38 @@
-<p>
-  This is the sign-up site for applicants visiting The University of
-  Nottingham School of Computer Science UCAS days who wish to take part in a
-  small group discussion with a member of staff. We will record your UCAS Id,
-  your name, and a contact email address (optional) against the slot for which
-  you sign up. Slots are allocated on a first-come first-served basis.
-</p>
+<div class="well">
+  <p>
+    This is the sign-up site for applicants visiting The University of
+    Nottingham School of Computer Science UCAS days who wish to take part in a
+    small group discussion with a member of staff. 
+  </p>
 
-<p>
-  <a class="btn btn-primary" href="{{root}}signup">Sign-up for a slot</a>
-</p>
+  <div>
+    <a class="btn btn-primary" href="{{root}}signup">Sign-up for a slot</a>
+  </div>
+</div>
 
 %if booking:
-<div id="booking">
+<div id="booking" class="well">
   <strong>
     {{ booking['name'] }}
-    <small>&lt;{{ booking['email'] }}&gt;, 
+    <small>
+%   if booking['email']:
+    &lt;{{ booking['email'] }}&gt;, 
+%   end
     UCAS Id {{ booking['ucasid'] }}
     </small>
-  is booked in at {{ booking['slot'] }}
-  in {{ booking['room'] }}
-  with {{ booking['staffname'] }}
+    is booked in at {{ booking['slot'] }}
+    in {{ booking['room'] }}
+    with {{ booking['staffname'] }}
   </strong>
 </div>
 %else:
-<form class="form-horizontal" method="post">
-  <fieldset>
-    <legend class="small">
-      Enter your UCAS Id and name to retrieve your booking
-    </legend>
+<div class="well">
+  <form class="form-horizontal" method="post">
+    <fieldset>
+      <p>
+        If you have previously signed up, enter your UCAS Id and name to
+        retrieve your booking:
+    </p>
     <div class="control-group">
       <label class="control-label" for="ucasid">UCAS Id</label>
       <div class="controls">
@@ -49,5 +54,7 @@
     </div>
   </div>
 </form>
+</div>
 %end
+
 %rebase layout root=root, breadcrumbs=breadcrumbs, error=error
