@@ -1,7 +1,8 @@
 .DEFAULT: test
 .PHONY: run test clean deploy
 
-MIRROR = rsync -avz --rsh=ssh --delete --exclude=.git --exclude=ucas.ini
+MIRROR = rsync -avz --rsh=ssh --delete \
+	--exclude=.git --exclude=ucas.ini --exclude=ucas.log
 
 run:
 	./server.py
