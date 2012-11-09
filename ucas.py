@@ -136,7 +136,6 @@ def do_signup(db):
     
     ucasid = request.forms.ucasid
     name   = request.forms.name
-    email  = request.forms.email
     slotid = request.forms.slotid
 
     ucasid = validate_ucasid(ucasid)
@@ -157,15 +156,12 @@ def do_signup(db):
             data.error = "booking-slot-death"
             return template('signup', data=data, slots=db.fetchall())
 
-        cmd = "INSERT INTO `ucas.bookings` VALUES (%s, %s, %s, %s)"
-        db.execute(cmd, (ucasid, name, email, slotid,))
+        cmd = "INSERT INTO `ucas.bookings` VALUES (%s, %s, %s)"
+        db.execute(cmd, (ucasid, name, slotid,))
         
     else:
         booking = db.fetchone()
-        if (booking
-            and ((len(name) > 0 and booking['name'] == name)
-                 or (len(email) > 0 and booking['email'] == email)
-                 )):
+        if (booking and (len(name) > 0 and booking['name'] == name)):
             cmd = "UPDATE `ucas.slots` "\
                 + "SET `spaces` = `spaces`+1 WHERE `slotid`=%s"
             db.execute(cmd, (booking['slotid'],))
@@ -176,9 +172,9 @@ def do_signup(db):
             db.execute(cmd, (slotid,))
 
             cmd = "UPDATE `ucas.bookings` "\
-                + "SET `name`=%s, `email`=%s, `slotid`=%s "\
-                + "WHERE `ucasid`=%s AND (`name`=%s OR `email`=%s)"
-            db.execute(cmd, (name, email, slotid, ucasid, name, email))
+                + "SET `slotid`=%s "\
+                + "WHERE `ucasid`=%s AND `name`=%s)"
+            db.execute(cmd, (slotid, ucasid, name))
 
         else:
             db.execute(SLOTS_SQL)

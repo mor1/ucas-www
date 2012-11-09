@@ -17,9 +17,6 @@
   <strong>
     {{ booking['name'] }}
     <small>
-      %   if booking['email']:
-      &lt;{{ booking['email'] }}&gt;, 
-      %   end
       UCAS Id {{ booking['ucasid'] }}
     </small>
     is booked in at {{ booking['slot'] }}

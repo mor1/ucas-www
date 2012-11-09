@@ -31,9 +31,9 @@ Config.read('ucas.ini')
 import MySQLdb
 
 Create_user = False
-Create_tables = False
-Really_really = False
-Add_for_Nov21 = False
+Create_tables = True
+Really_really = True
+Add_for_Nov21 = True
 
 if __name__ == '__main__':
 
@@ -69,7 +69,6 @@ create database if not exists `rmm`
 create table if not exists `rmm`.`ucas.staff` (
   staffid varchar(5) not null,
   staffname varchar(32) not null,
-  email varchar(128) not null,
   research varchar(128),
   modules varchar(64),
   primary key (staffid)
@@ -92,7 +91,6 @@ create table if not exists `rmm`.`ucas.slots` (
 create table if not exists `rmm`.`ucas.bookings` (
   ucasid varchar(32) not null,
   name varchar(64) not null,
-  email varchar(128),
   slotid int not null,
   foreign key (slotid) references `ucas.slots`(slotid)  
 )
@@ -101,12 +99,12 @@ create table if not exists `rmm`.`ucas.bookings` (
     if Add_for_Nov21:
         print dbc.execute("""
 insert into `rmm`.`ucas.staff` 
-  (staffid, staffname, email, research, modules)
+  (staffid, staffname, research, modules)
 values
-  ("bsl", "Brian Logan", "bsl@cs.nott.ac.uk", "Artificial Intelligence", "G52APT, G54DIA"),
-  ("nhn", "Henrik Nilsson", "nhn@cs.nott.ac.uk", "Programming Languages", "G51FUN"),
-  ("srb", "Steve Bagley", "srb@cs.nott.ac.uk", "Document Engineering", "G51PRG, G53DOC"),
-  ("bnk", "Boriana Koleva", "bnk@cs.nott.ac.uk", "Human Computer Interaction",
+  ("bsl", "Brian Logan", "Artificial Intelligence", "G52APT, G54DIA"),
+  ("nhn", "Henrik Nilsson", "Programming Languages", "G51FUN"),
+  ("srb", "Steve Bagley", "Document Engineering", "G51PRG, G53DOC"),
+  ("bnk", "Boriana Koleva", "Human Computer Interaction",
         "G51WPS")
 """)
 

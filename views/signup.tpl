@@ -1,7 +1,6 @@
 <p>
-  We will record your UCAS Id, your name, and a contact email address
-  (optional) against the slot for which you sign up. Slots are allocated on a
-  first-come first-served basis.
+  We will record your UCAS Id and your name against the slot for which you
+  sign up. Slots are allocated on a first-come first-served basis.
 </p>
 
 %if len(slots) == 0:
@@ -49,13 +48,6 @@
           details don't match &ndash; please check and retry
         </span>
 %end
-      </div>
-    </div>
-    <div class="control-group">
-      <label class="control-label" for="email">Contact Email</label>
-      <div class="controls">
-        <input type="text" name="email" />
-        <small>optional</small>
       </div>
     </div>
   </fieldset>
