@@ -17,7 +17,7 @@
   <strong>
     {{ booking['name'] }}
     <small>
-      UCAS Id {{ booking['ucasid'] }}
+      UCAS Personal Number {{ booking['ucasid'] }}
     </small>
     is booked in at {{ booking['slot'] }}
     in {{ booking['room'] }}
@@ -29,15 +29,17 @@
   <form class="form-horizontal" method="post">
     <fieldset>
       <p>
-        If you have previously signed up, enter your UCAS Id and name to
-        retrieve your booking:
+        If you have previously signed up, enter your UCAS Personal Number and
+        name to retrieve your booking:
       </p>
       <div class="control-group
 %if data.error and data.error == "booking-mismatch":
       error
 %end
       ">
-        <label class="control-label" for="ucasid">UCAS Id</label>
+        <label class="control-label" for="ucasid">
+          UCAS Personal Number
+        </label>
         <div class="controls">
           <input type="text" name="ucasid" placeholder="e.g., 123-456-7890"
                  autofocus required />

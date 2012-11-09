@@ -1,6 +1,6 @@
 <p>
-  We will record your UCAS Id and your name against the slot for which you
-  sign up. Slots are allocated on a first-come first-served basis.
+  We will record your UCAS Personal Number and your name against the slot for
+  which you sign up. Slots are allocated on a first-come first-served basis.
 </p>
 
 %if len(slots) == 0:
@@ -20,7 +20,7 @@
       error
 %end
       ">
-      <label class="control-label" for="ucasid">UCAS Id</label>
+      <label class="control-label" for="ucasid">UCAS Personal Number</label>
       <div class="controls">
         <input type="text" name="ucasid" placeholder="e.g., 123-456-7890"
                required autofocus />
@@ -28,13 +28,13 @@
 %if data.error and data.error == "ucasid-validation":
         <span class="help-inline">
           <i class="icon-warning-sign"></i>
-          invalid UCAS Id &ndash; please check and retry
+          invalid UCAS Personal Number &ndash; please check and retry
         </span>
 %end
       </div>
     </div>    
     <div class="control-group
-%if data.error and data.error == "booking-mismatch":
+%if data.error and data.error in ("booking-mismatch", "name-validation"):
       error
 %end
       ">
@@ -46,6 +46,11 @@
         <span class="help-inline">
           <i class="icon-warning-sign"></i>
           details don't match &ndash; please check and retry
+        </span>
+%elif data.error and data.error == "name-validation":
+        <span class="help-inline">
+          <i class="icon-warning-sign"></i>
+          <i>Name</i> cannot be blank &ndash; please complete and retry
         </span>
 %end
       </div>
@@ -75,7 +80,7 @@
 
   <hr style="margin-bottom: 0" />
   <div class="control-group">
-    <div class="form-actions pull-right" style="border-top: none">
+    <div class="form-actions pull-left" style="border-top: none">
       <input type="submit" class="btn span4 btn-primary" value="Submit" />
     </div>
   </div>

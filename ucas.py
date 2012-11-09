@@ -57,10 +57,15 @@ def validate_ucasid(ucasid=None):
     if not ucasid: return None
 
     ds = ''.join([ s for s in ucasid if s.isdigit() ])
-    print "DS", ds, len(ds)
     if len(ds) != 10: return None
 
     return "%s-%s-%s" % (ds[0:3], ds[3:6], ds[6:10])
+
+def validate_name(name=None):
+    '''Accept anything that's not blank.'''
+
+    if not name: return None
+    return name
 
 class Data:
     def __init__(self): ## rendering data, with defaults
@@ -141,6 +146,13 @@ def do_signup(db):
     ucasid = validate_ucasid(ucasid)
     if not ucasid:
         data.error = "ucasid-validation"
+        db.execute(SLOTS_SQL)
+        slots = db.fetchall()
+        return template("signup", data=data, booking=booking, slots=slots)
+
+    name = validate_name(name)
+    if not name:
+        data.error = "name-validation"
         db.execute(SLOTS_SQL)
         slots = db.fetchall()
         return template("signup", data=data, booking=booking, slots=slots)
