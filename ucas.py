@@ -24,12 +24,16 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-import logging
-logging.basicConfig(filename='ucas.log',level=logging.INFO)
-
 import ConfigParser
 Config = ConfigParser.ConfigParser()
 Config.read('ucas.ini')
+
+import logging
+logging.basicConfig(
+    format='%(asctime)s - %(name)s - %(levelname)s\n  %(message)s',
+    filename=Config.get("server", "logfile"), 
+    level=logging.INFO
+    )
 
 ROOT = Config.get("server", "root")
 STATIC_FILES = ('favicon.ico', 'robots.txt', 'css/ucas.css',
