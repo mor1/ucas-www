@@ -24,6 +24,9 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
+import logging
+logging.basicConfig(filename='ucas.log',level=logging.INFO)
+
 import ConfigParser
 Config = ConfigParser.ConfigParser()
 Config.read('ucas.ini')
@@ -73,6 +76,12 @@ class Data:
         self.breadcrumbs = [ ("Home", ROOT,) ]
         self.error = None
 
+@error(404)
+@error(500)
+def error(error):
+    data = Data()
+    return template('error', data=data, error=error)
+
 @app.post('/')
 @app.get('/')
 def retrieve_booking(db, ucasid=None, name=None):
@@ -88,14 +97,18 @@ def retrieve_booking(db, ucasid=None, name=None):
         ucasid = request.query.ucasid
         name = request.query.name
 
+    logging.info("+ retrieve: ucasid='%s' name='%s'" % (ucasid, name))
+
     if not ucasid: 
         ## entry page, permitting booking retrieval
+        logging.info("- retrieve: root page")
         return template('root', data=data, booking=booking)
     
     ucasid = validate_ucasid(ucasid)
     if not ucasid:
         ## mash data.error
         data.error = "ucasid-validation"
+        logging.info("- retrieve: ucasid failed validation")
         return template('root', data=data, booking=booking)
     
     cmd = "SELECT `ucas.bookings`.*, `ucas.slots`.*, `ucas.staff`.* "\
@@ -111,13 +124,17 @@ def retrieve_booking(db, ucasid=None, name=None):
         booking = db.fetchone()
         if not booking: data.error = "booking-fetch"
 
-    ## mash data.error
+    if data.error: logging.info("- retrieve: %s" % (data.error,))
+    else:
+        logging.info('- retreive: booking="%s"' % (booking,))
+
     return template('root', data=data, booking=booking)
 
 @app.get('/<filename:path>')
 def static(filename): 
     '''Retrieve static resource.'''
 
+    logging.info("+- static: filename='%s'" % (filename,))
     if filename in STATIC_FILES:
         return bottle.static_file(filename, root='./static')
     return bottle.HTTPError(404, "Page not found")            
@@ -125,6 +142,8 @@ def static(filename):
 @app.get('/signup')
 def signup(db):
     '''Display signup form.'''
+
+    logging.info("+- signup: display form")
 
     data = Data()
     data.breadcrumbs.append(("Signup", "/signup"))
@@ -142,12 +161,16 @@ def do_signup(db):
     ucasid = request.forms.ucasid
     name   = request.forms.name
     slotid = request.forms.slotid
+    
+    logging.info('+ signup: ucasid="%s" name="%s" slotid="%s"' % (
+            ucasid, name, slotid))
 
     ucasid = validate_ucasid(ucasid)
     if not ucasid:
         data.error = "ucasid-validation"
         db.execute(SLOTS_SQL)
         slots = db.fetchall()
+        logging.info("- signup: ucasid failed validation")
         return template("signup", data=data, booking=booking, slots=slots)
 
     name = validate_name(name)
@@ -155,6 +178,7 @@ def do_signup(db):
         data.error = "name-validation"
         db.execute(SLOTS_SQL)
         slots = db.fetchall()
+        logging.info("- signup: name failed validation")
         return template("signup", data=data, booking=booking, slots=slots)
 
     cmd = "SELECT * FROM `ucas.bookings` WHERE `ucasid`=%s"
@@ -166,6 +190,7 @@ def do_signup(db):
         if n != 1:
             db.execute(SLOTS_SQL)
             data.error = "booking-slot-death"
+            logging.info("- signup: %s" % (data.error,))
             return template('signup', data=data, slots=db.fetchall())
 
         cmd = "INSERT INTO `ucas.bookings` VALUES (%s, %s, %s)"
@@ -194,17 +219,13 @@ def do_signup(db):
             if not booking: data.error = "booking-fetch"
             else:
                 data.error = "booking-mismatch"
+            logging.info("- signup: %s" % (data.error,))
             return template('signup', data=data, slots=slots)
 
     from urllib import urlencode
-    return redirect('%s?%s' % (
-            ROOT, urlencode({'ucasid':ucasid, 'name':name }),))
-
-@error(404)
-@error(500)
-def error(error):
-    data = Data()
-    return template('error', data=data, error=error)
+    params = urlencode({'ucasid':ucasid, 'name':name })
+    logging.info("- signup: params='%s'" % (params,))
+    return redirect('%s?%s' % (ROOT, params))
 
 if __name__ == '__main__':
     bottle.run(app, host='localhost', port=8080, reloader=True, debug=True)
