@@ -31,9 +31,9 @@ Config.read('ucas.ini')
 import MySQLdb
 
 Create_user = False
-Create_tables = True
-Really_really = True
-Add_for_Nov21 = True
+Create_tables = False
+Really_really = False
+Add_for_Nov21 = False
 
 if __name__ == '__main__':
 
