@@ -40,7 +40,7 @@ SLOTS_SQL = "SELECT `ucas.slots`.*, `ucas.staff`.* "\
     + "  ORDER BY `ucas.slots`.slot, `ucas.slots`.spaces DESC"
 
 import bottle, bottle_mysql
-from bottle import request, template, redirect
+from bottle import request, template, redirect, error
 
 app = bottle.Bottle()
 plugin = bottle_mysql.Plugin(
@@ -199,6 +199,12 @@ def do_signup(db):
     from urllib import urlencode
     return redirect('%s?%s' % (
             ROOT, urlencode({'ucasid':ucasid, 'name':name }),))
+
+@error(404)
+@error(500)
+def error(error):
+    data = Data()
+    return template('error', data=data, error=error)
 
 if __name__ == '__main__':
     bottle.run(app, host='localhost', port=8080, reloader=True, debug=True)
