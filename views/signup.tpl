@@ -66,6 +66,7 @@
       <small>with</small> {{ slots[0]['staffname'] }}
       <small>who teaches</small> {{ slots[0]['modules'] }}
       <small>and researches</small> {{ slots[0]['research'] }}
+      <small>({{ slots[0]['spaces'] }} places remaining)</small>
     </label>
 %for slot in slots[1:]:
     <label class="radio">
@@ -74,6 +75,7 @@
       <small>with</small> {{ slot['staffname'] }}
       <small>who teaches</small> {{ slot['modules'] }}
       <small>and researches</small> {{ slot['research'] }}
+      <small>({{ slot['spaces'] }} places remaining)</small>
     </label>
 %end
   </fieldset>
