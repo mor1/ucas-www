@@ -87,7 +87,9 @@ def error(error):
     return template('error', data=data, error=error)
 
 @app.post('/')
+@app.post('')
 @app.get('/')
+@app.get('')
 def retrieve_booking(db, ucasid=None, name=None):
     '''Retrieve existing booking, indexed by <ucasid> and <name>.'''
 
