@@ -32,7 +32,7 @@ from flup.server.ajp import WSGIServer
 import ucas
 
 WSGIServer(ucas.app, 
-           scriptName=Config.get('server', 'root').rstrip("/"),
+           scriptName=Config.get('server', 'path').rstrip("/"),
            bindAddress=(Config.get('server', 'host'), 
                         Config.getint('server', 'port')),
            ).run()

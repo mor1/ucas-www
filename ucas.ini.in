@@ -1,5 +1,6 @@
 [server]
-root: /baseurl
+root: /root-for-assets
+path: /root-for-routing
 host: hostname
 port: portno
 logfile: filename
