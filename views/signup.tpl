@@ -63,6 +63,7 @@
       <input type="radio" name="slotid" value="{{ slots[0]['slotid'] }}"
              checked />
       <small>at</small> {{ slots[0]['slot'] }}
+      <small>in</small> {{ slots[0]['room'] }}
       <small>with</small> {{ slots[0]['staffname'] }}
       <small>who teaches</small> {{ slots[0]['modules'] }}
       <small>and researches</small> {{ slots[0]['research'] }}
@@ -72,6 +73,7 @@
     <label class="radio">
       <input type="radio" name="slotid" value="{{ slot['slotid'] }}" />
       <small>at</small> {{ slot['slot'] }}
+      <small>in</small> {{ slot['room'] }}
       <small>with</small> {{ slot['staffname'] }}
       <small>who teaches</small> {{ slot['modules'] }}
       <small>and researches</small> {{ slot['research'] }}
