@@ -5,7 +5,10 @@
 
 %if len(slots) == 0:
 <p>
-  Sorry! No remaining slots.
+  Sorry! We have no upcoming UCAS visit dates with small group discussions
+  scheduled at this time. We will be updating this soon, so please check do
+  back or <a href="mailto:admissions@cs.nott.ac.uk">contact us</a> if you wish
+  to register interest.
 </p>
 %else:
 <hr />
