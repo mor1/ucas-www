@@ -39,12 +39,23 @@ ROOT = Config.get("server", "root")
 STATIC_FILES = ('favicon.ico', 'robots.txt', 'css/ucas.css',
                 'img/glyphicons-halflings.png', )
 
-SLOTS_SQL = "SELECT `ucas.slots`.*, `ucas.staff`.* "\
-    + "  FROM `ucas.slots` "\
-    + "  INNER JOIN `ucas.staff` "\
-    + "  ON `ucas.slots`.staffid = `ucas.staff`.staffid "\
-    + "  WHERE `ucas.slots`.spaces > 0 "\
-    + "  ORDER BY `ucas.slots`.slot, `ucas.slots`.spaces DESC"
+BASE_URL = "http://modulecatalogue.nottingham.ac.uk/nottingham/asp/moduledetails.asp"
+SLOTS_SQL = (
+    "SELECT "
+    + " slots.slotid, slots.slot, slots.room, slots.spaces, "
+    + " staff.staffid, staff.staffname, staff.research "
+    + "  FROM `ucas.slots` AS `slots` "
+    + "  INNER JOIN `ucas.staff` AS `staff` "
+    + "  ON `slots`.staffid = `staff`.staffid "
+    + "  WHERE `slots`.spaces > 0 "
+    + "  ORDER BY `slots`.slot, `slots`.spaces DESC"
+    )
+
+MODULES_SQL = (
+    "SELECT "
+    + " modules.staffid, modules.code, modules.crsid "
+    + "FROM `ucas.modules` AS `modules` "
+    )
 
 import bottle, bottle_mysql
 from bottle import request, template, redirect, error
@@ -73,6 +84,19 @@ def validate_name(name=None):
 
     if not name: return None
     return name
+
+def get_slots(db):
+    db.execute(SLOTS_SQL)
+    slots = db.fetchall()
+    db.execute(MODULES_SQL)
+    modules = db.fetchall()
+
+    for slot in slots:
+        slot['modules'] = [ m
+                            for m in modules
+                            if m['staffid'] == slot['staffid'] ]
+        print slot
+    return slots
 
 class Data:
     def __init__(self): ## rendering data, with defaults
@@ -154,8 +178,7 @@ def signup(db):
     data = Data()
     data.breadcrumbs.append(("Signup", "/signup"))
 
-    db.execute(SLOTS_SQL)
-    return template('signup', data=data, slots=db.fetchall())
+    return template('signup', data=data, slots=get_slots(db), base_url=BASE_URL)
 
 @app.post('/signup')
 def do_signup(db):
@@ -174,18 +197,16 @@ def do_signup(db):
     ucasid = validate_ucasid(ucasid)
     if not ucasid:
         data.error = "ucasid-validation"
-        db.execute(SLOTS_SQL)
-        slots = db.fetchall()
+        slots = get_slots(db)
         logging.info("- signup: ucasid failed validation")
-        return template("signup", data=data, booking=booking, slots=slots)
+        return template("signup", data=data, booking=booking, slots=slots, base_url=BASE_URL)
 
     name = validate_name(name)
     if not name:
         data.error = "name-validation"
-        db.execute(SLOTS_SQL)
-        slots = db.fetchall()
+        slots = get_slots(db)
         logging.info("- signup: name failed validation")
-        return template("signup", data=data, booking=booking, slots=slots)
+        return template("signup", data=data, booking=booking, slots=slots, base_url=BASE_URL)
 
     cmd = "SELECT * FROM `ucas.bookings` WHERE `ucasid`=%s"
     n = db.execute(cmd, (ucasid, ))
@@ -194,10 +215,10 @@ def do_signup(db):
             + "SET `spaces` = `spaces`-1 WHERE `slotid`=%s AND `spaces`>0"
         n = db.execute(cmd, (slotid,))
         if n != 1:
-            db.execute(SLOTS_SQL)
+            slots = get_slots(db)
             data.error = "booking-slot-death"
             logging.info("- signup: %s" % (data.error,))
-            return template('signup', data=data, slots=db.fetchall())
+            return template('signup', data=data, slots=slots, base_url=BASE_URL)
 
         cmd = "INSERT INTO `ucas.bookings` VALUES (%s, %s, %s)"
         db.execute(cmd, (ucasid, name, slotid,))
@@ -220,13 +241,12 @@ def do_signup(db):
             db.execute(cmd, (slotid, ucasid, name))
 
         else:
-            db.execute(SLOTS_SQL)
-            slots = db.fetchall()
+            slots = get_slots(db)
             if not booking: data.error = "booking-fetch"
             else:
                 data.error = "booking-mismatch"
             logging.info("- signup: %s" % (data.error,))
-            return template('signup', data=data, slots=slots)
+            return template('signup', data=data, slots=slots, base_url=BASE_URL)
 
     from urllib import urlencode
     params = urlencode({'ucasid':ucasid, 'name':name })

@@ -24,58 +24,62 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-import ConfigParser
+import sys, ConfigParser
 Config = ConfigParser.ConfigParser()
 Config.read('ucas.ini')
 
 import MySQLdb
 
 Create_user = False
-Create_tables = False
-Really_really = False
-Add_for_Nov21 = False
+Create_tables = True
+Really_really = True
+Add_staff = True
+Add_slots = True
 
-if __name__ == '__main__':
-
-    db = MySQLdb.connect(
-        host=Config.get("database", "host"),
-        user=Config.get("database", "user"), 
-        passwd=Config.get("database", "pass"), 
-        )
-    dbc = db.cursor()
-
-    if Create_user:
-        ## as root
-        dbc.execute("create user 'user'@'localhost' IDENTIFIED BY 'password'")
-        dbc.execute("grant all privileges on ucas.* to 'user'@'localhost'")
-        dbc.execute("""
-create database if not exists `rmm`
+def create_user():
+    ## as root
+    host = Config.get("database", "host")
+    user = Config.get("database", "user")
+    passwd = Config.get("database", "pass")
+    print """
+mysql -h %s -u root -p <<__EOF
+drop user rmm@localhost;
+create user '%s'@'localhost' IDENTIFIED BY '%s';
+grant all privileges on rmm.* to '%s'@'localhost';
+create database if not exists rmm
   character set 'utf8'
   collate 'utf8_unicode_ci'
-""")
+__EOF
+""" % (host, user, passwd, user,)
 
-    if Create_tables:
-        ## as user
-
-        if Really_really:
-            print dbc.execute("drop table if exists `rmm`.`ucas.bookings`")
-            db.commit()
-            print dbc.execute("drop table if exists `rmm`.`ucas.slots`")
-            db.commit()
-            print dbc.execute("drop table if exists `rmm`.`ucas.staff`")
-            db.commit()
-
-        print dbc.execute("""
+def create_tables(dbc):
+    if Really_really:
+        print dbc.execute("drop table if exists `rmm`.`ucas.bookings`")
+        db.commit()
+        print dbc.execute("drop table if exists `rmm`.`ucas.slots`")
+        db.commit()
+        print dbc.execute("drop table if exists `rmm`.`ucas.staff`")
+        db.commit()
+        
+    print dbc.execute("""
 create table if not exists `rmm`.`ucas.staff` (
   staffid varchar(5) not null,
   staffname varchar(32) not null,
   research varchar(128),
-  modules varchar(64),
   primary key (staffid)
 )
 """)
 
-        print dbc.execute("""
+    print dbc.execute("""
+create table if not exists `rmm`.`ucas.modules` (
+  code varchar(6) not null,
+  crsid varchar(6) not null,
+  primary key (code),
+  staffid varchar(5) not null,
+  foreign key (staffid) references `ucas.staff`(staffid)
+)
+""")
+    print dbc.execute("""
 create table if not exists `rmm`.`ucas.slots` (
   slotid int not null auto_increment,
   slot datetime not null,
@@ -87,7 +91,7 @@ create table if not exists `rmm`.`ucas.slots` (
 )
 """)
 
-        print dbc.execute("""
+    print dbc.execute("""
 create table if not exists `rmm`.`ucas.bookings` (
   ucasid varchar(32) not null,
   name varchar(64) not null,
@@ -95,28 +99,57 @@ create table if not exists `rmm`.`ucas.bookings` (
   foreign key (slotid) references `ucas.slots`(slotid)  
 )
 """)
-
-    if Add_for_Nov21:
-        print dbc.execute("""
+    
+def add_staff(dbc):
+    print dbc.execute("""
 insert into `rmm`.`ucas.staff` 
-  (staffid, staffname, research, modules)
+  (staffid, staffname, research)
 values
-  ("bsl", "Brian Logan", "Artificial Intelligence", "G52APT, G54DIA"),
-  ("nhn", "Henrik Nilsson", "Programming Languages", "G51FUN"),
-  ("srb", "Steve Bagley", "Document Engineering", "G51PRG, G53DOC"),
-  ("bnk", "Boriana Koleva", "Human Computer Interaction",
-        "G51WPS")
+  ("bsl", "Brian Logan", "artificial intelligence in general"),
+  ("nhn", "Henrik Nilsson", "programming languages and second year group projects"),
+  ("srb", "Steve Bagley", "how computers manipulate and process documents, and eBook technology"),
+  ("bnk", "Boriana Koleva", "human computer interaction and third year projects")
 """)
 
-        print dbc.execute("""
+    print dbc.execute("""
+insert into `rmm`.`ucas.modules`
+  (staffid, code, crsid)
+values
+  ("bsl", "G52APT", "021245"),
+  ("bsl", "G52DIA", "021226"),
+  ("nhn", "G53CMP", "021224"),
+  ("nhn", "G54FOP", "018385"),
+  ("srb", "G53DOC", "021231"),
+  ("srb", "G51PRG", "012192"),
+  ("bnk", "G51WPS", "017011")
+""") 
+
+def add_slots(dbc):
+    print dbc.execute("""
 insert into `rmm`.`ucas.slots`
   (slot, room, staffid, spaces)
 values
-  ("2012-11-21 11:00", "C1", "bsl", 8),
-  ("2012-11-21 11:00", "C80", "nhn", 8),
-  ("2012-11-21 11:00", "Exchange", "srb", 8),
-  ("2012-11-21 11:00", "Atrium", "bnk", 8)
+  ("2012-12-05 14:00", "Pod 1", "bnk", 7),
+  ("2012-12-05 14:00", "Hub", "nhn", 7),
+  ("2012-12-05 14:00", "Pod 3", "srb", 7),
+  ("2012-12-05 14:00", "Pod 2", "bsl", 7)
 """)
 
-    db.commit()
+if __name__ == '__main__':
 
+    if Create_user: 
+        create_user()
+        sys.exit(0)
+
+    db = MySQLdb.connect(
+        host=Config.get("database", "host"),
+        user=Config.get("database", "user"), 
+        passwd=Config.get("database", "pass"), 
+        )
+    dbc = db.cursor()
+
+    if Create_tables: create_tables(dbc)
+    if Add_staff: add_staff(dbc)
+    if Add_slots: add_slots(dbc)
+
+    db.commit()
