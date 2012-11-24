@@ -95,7 +95,6 @@ def get_slots(db):
         slot['modules'] = [ m
                             for m in modules
                             if m['staffid'] == slot['staffid'] ]
-        print slot
     return slots
 
 class Data:
