@@ -57,8 +57,8 @@ MODULES_SQL = (
     + "FROM `ucas.modules` AS `modules` "
     )
 
-import bottle, bottle_mysql
-from bottle import request, template, redirect, error
+import bottle, bottle_mysql, hashlib
+from bottle import request, response, template, redirect, error
 
 app = bottle.Bottle()
 plugin = bottle_mysql.Plugin(
@@ -251,6 +251,61 @@ def do_signup(db):
     params = urlencode({'ucasid':ucasid, 'name':name })
     logging.info("- signup: params='%s'" % (params,))
     return redirect('%s?%s' % (ROOT, params))
+
+@app.get('/staff/login')
+def staff_login(db):
+    return '''<p>login</p>
+              <form method="POST" action="/staff/login">
+                <input name="password" type="password" />
+                <input type="submit" />
+              </form>'''
+
+    # data = Data()
+    # data.breadcrumbs.append(("Staff Signup", "/staff-signup"))
+    # return template('signup', data=data, slots=get_slots(db), base_url=BASE_URL)
+
+@app.post('/staff/login')
+def staff_login_submit():
+    
+    def check_login(u, p):
+        sha = hashlib.sha1(p).hexdigest()
+        logging.info("P:'%s' SHA: %s" % (p,sha))
+        return (sha == Config.get('www', 'pass'))
+
+    name = request.forms.get('name')
+    password = request.forms.get('password')
+    if check_login(name, password):
+        response.set_cookie("staff-signed-in", "True", 
+                            httponly=True,
+                            secret=Config.get('www', 'key'))
+        return '''<p>Welcome! You are now logged in.</p>
+                  <a href="/staff/signup">sign up</a>
+                  <a href="/staff/logout">logout</a>
+               '''
+    else:
+        return '''<p>Login failed</p><a href="/staff/login">login</a>'''
+
+@app.get('/staff/logout')
+def staff_logout():
+    response.delete_cookie('staff-signed-in')
+    return '''<p>logged out</p><a href="/staff/login">login</a>'''
+
+@app.get('/staff/signup')
+def staff_signup(db):
+    signedin = bool(request.get_cookie(
+        "staff-signed-in", secret=Config.get('www', 'key')))
+    
+    if signedin:
+        return '''<p>welcome back</p>
+                  <form method="POST" action="/staff/signup">
+                    <input type="submit" />
+                  </form>'''
+    else:
+        return '''You are not logged in. Access denied. <a href="/staff/login">login</a>'''
+
+@app.post('/staff/signup')
+def staff_signup_submit(db):
+    return '''<p>Submitted!</p>'''
 
 if __name__ == '__main__':
     bottle.run(app, host='localhost', port=8080, reloader=True, debug=True)

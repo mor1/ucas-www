@@ -11,3 +11,6 @@ user: user
 pass: pass
 name: dbname
 
+[www]
+key: some-secret-key
+pass: signup-password-sha1-hash
