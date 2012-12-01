@@ -73,6 +73,7 @@
       <a href="{{ base_url }}?crs_id={{ module['crsid'] }}&year_id=000112">{{ module['code'] }}</a>, 
       %end
       <a href="{{ base_url }}?crs_id={{ slots[0]['modules'][-1]['crsid'] }}&year_id=000112">{{ slots[0]['modules'][-1]['code'] }}</a>
+      <br />&nbsp;&nbsp;&nbsp;
       <small>and can talk about</small> {{ slots[0]['research'] }}.
       <br />
       <small>({{ slots[0]['spaces'] }} places remaining)</small>
@@ -88,6 +89,7 @@
       <a href="{{ base_url }}?crs_id={{ module['crsid'] }}&year_id=000112">{{ module['code'] }}</a>, 
       %end
       <a href="{{ base_url }}?crs_id={{ slot['modules'][-1]['crsid'] }}&year_id=000112">{{ slot['modules'][-1]['code'] }}</a>
+      <br />&nbsp;&nbsp;&nbsp;
       <small>and can talk about</small> {{ slot['research'] }}.
       <br />
       <small>({{ slot['spaces'] }} places remaining)</small>
