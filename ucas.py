@@ -109,10 +109,10 @@ def error(error):
     data = Data()
     return template('error', data=data, error=error)
 
-@app.post('/')
-@app.post('')
 @app.get('/')
+@app.post('/')
 @app.get('')
+@app.post('')
 def retrieve_booking(db, ucasid=None, name=None):
     '''Retrieve existing booking, indexed by <ucasid> and <name>.'''
 
@@ -254,58 +254,57 @@ def do_signup(db):
 
 @app.get('/staff/login')
 def staff_login(db):
-    return '''<p>login</p>
-              <form method="POST" action="/staff/login">
-                <input name="password" type="password" />
-                <input type="submit" />
-              </form>'''
 
-    # data = Data()
-    # data.breadcrumbs.append(("Staff Signup", "/staff-signup"))
-    # return template('signup', data=data, slots=get_slots(db), base_url=BASE_URL)
+    data = Data()
+    data.breadcrumbs.append(("Staff Login", "/staff/login"))
+    return template('login', data=data)
 
 @app.post('/staff/login')
 def staff_login_submit():
     
-    def check_login(u, p):
+    def check_password(p):
         sha = hashlib.sha1(p).hexdigest()
-        logging.info("P:'%s' SHA: %s" % (p,sha))
         return (sha == Config.get('www', 'pass'))
 
-    name = request.forms.get('name')
     password = request.forms.get('password')
-    if check_login(name, password):
+    if check_password(password):
         response.set_cookie("staff-signed-in", "True", 
-                            httponly=True,
-                            secret=Config.get('www', 'key'))
-        return '''<p>Welcome! You are now logged in.</p>
-                  <a href="/staff/signup">sign up</a>
-                  <a href="/staff/logout">logout</a>
-               '''
+                            httponly=True, secret=Config.get('www', 'key'))
+        return redirect('/staff/signup')
+
     else:
-        return '''<p>Login failed</p><a href="/staff/login">login</a>'''
+        data = Data()
+        data.error = "login-password"
+        data.breadcrumbs.append(("Staff Login", "/staff/login"))
+        return template('login', data=data)
 
 @app.get('/staff/logout')
 def staff_logout():
     response.delete_cookie('staff-signed-in')
-    return '''<p>logged out</p><a href="/staff/login">login</a>'''
+    return redirect('/staff/login')
 
 @app.get('/staff/signup')
 def staff_signup(db):
     signedin = bool(request.get_cookie(
         "staff-signed-in", secret=Config.get('www', 'key')))
     
+    data = Data()
     if signedin:
-        return '''<p>welcome back</p>
-                  <form method="POST" action="/staff/signup">
-                    <input type="submit" />
-                  </form>'''
+        db.execute("SELECT * FROM `ucas.dates`")
+        dates = db.fetchall()
+        data.breadcrumbs.append(("Staff Signup", "/staff/signup"))
+        return template('staff-signup', data=data, dates=dates)
     else:
-        return '''You are not logged in. Access denied. <a href="/staff/login">login</a>'''
+        data.error = 'signup-login'
+        data.breadcrumbs.append(("Staff Login", "/staff/login"))
+        return template('login', data=data)
 
 @app.post('/staff/signup')
 def staff_signup_submit(db):
-    return '''<p>Submitted!</p>'''
+    logging.info(request.forms.items())
+    data = Data()
+    data.breadcrumbs.append(("Staff Signups", "/staff/signup"))
+    return template('staff-signups', data=data)
 
 if __name__ == '__main__':
     bottle.run(app, host='localhost', port=8080, reloader=True, debug=True)

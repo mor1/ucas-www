@@ -32,9 +32,11 @@ import MySQLdb
 
 Create_user = False
 Create_tables = True
-Really_really = True
-Add_staff = True
-Add_slots = True
+Really_really = False
+Add_staff = False
+Add_slots = False
+Add_dates = True
+Add_modules = True
 
 def create_user():
     ## as root
@@ -60,6 +62,20 @@ def create_tables(dbc):
         db.commit()
         print dbc.execute("drop table if exists `rmm`.`ucas.staff`")
         db.commit()
+        print dbc.execute("drop table if exists `rmm`.`ucas.modules`")
+        db.commit()
+        print dbc.execute("drop table if exists `rmm`.`ucas.dates`")
+        db.commit()
+        print dbc.execute("drop table if exists `rmm`.`ucas.signups`")
+        db.commit()
+
+    print dbc.execute("""
+create table if not exists `rmm`.`ucas.dates` (
+  dateid int not null auto_increment,
+  date datetime not null,
+  primary key (dateid)
+)
+""")
         
     print dbc.execute("""
 create table if not exists `rmm`.`ucas.staff` (
@@ -71,6 +87,15 @@ create table if not exists `rmm`.`ucas.staff` (
 """)
 
     print dbc.execute("""
+create table if not exists `rmm`.`ucas.signups` (
+  dateid int not null,
+  foreign key (dateid) references `ucas.dates`(dateid),
+  staffid varchar(5) not null,
+  foreign key (staffid) references `ucas.staff`(staffid)
+)
+""")
+        
+    print dbc.execute("""
 create table if not exists `rmm`.`ucas.modules` (
   code varchar(6) not null,
   crsid varchar(6) not null,
@@ -79,6 +104,7 @@ create table if not exists `rmm`.`ucas.modules` (
   foreign key (staffid) references `ucas.staff`(staffid)
 )
 """)
+
     print dbc.execute("""
 create table if not exists `rmm`.`ucas.slots` (
   slotid int not null auto_increment,
@@ -135,6 +161,28 @@ values
   ("2012-12-05 14:00", "Pod 2", "bsl", 7)
 """)
 
+def add_dates(dbc):
+    print dbc.execute("""
+insert into `rmm`.`ucas.dates`
+  (date)
+values
+  ("2012-11-21 14:00"),
+  ("2012-12-05 14:00"),
+  ("2013-01-23 14:00"),
+  ("2013-01-30 14:00"),
+  ("2013-02-06 14:00"),
+  ("2013-02-13 14:00"),
+  ("2013-02-16 14:00"),
+  ("2013-02-20 14:00"),
+  ("2013-02-27 14:00"),
+  ("2013-03-06 14:00"),
+  ("2013-03-13 14:00"),
+  ("2013-03-16 14:00"),
+  ("2013-03-20 14:00"),
+  ("2013-03-27 14:00"),
+  ("2013-04-03 14:00")
+""")
+
 if __name__ == '__main__':
 
     if Create_user: 
@@ -151,5 +199,7 @@ if __name__ == '__main__':
     if Create_tables: create_tables(dbc)
     if Add_staff: add_staff(dbc)
     if Add_slots: add_slots(dbc)
+    if Add_dates: add_dates(dbc)
+    if Add_modules: add_modules(dbc)
 
     db.commit()

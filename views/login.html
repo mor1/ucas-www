@@ -1,0 +1,21 @@
+<form class="form-inline" method="post" action="/staff/login">
+  <fieldset>
+    <label for="password"><strong>enter password:</strong></label>
+    <input type="password" name="password" 
+           placeholder="password" required autofocus />
+    <input type="submit" class="btn" value="login" />
+    %if data.error:
+    <span class="help-inline">
+      <i class="icon-warning-sign"> </i>
+      %if data.error == "login-password":
+      invalid password &ndash; please try again
+      %elif data.error == "signup-login":
+      access denied &ndash; you are not logged in
+      %end
+    </span>
+    %end
+
+  </fieldset>
+</form>
+
+%rebase layout data=data
