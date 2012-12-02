@@ -1,0 +1,99 @@
+G50PRO |	Introduction to Programming	
+G50WEB |	Introduction to the Web	
+G51APS |	Algorithmic Problem Solving	
+G51CSA |	Computer Systems Architecture	
+G51DBS |	Database Systems	
+G51FSE |	Introduction to Software Engineering	
+G51FUN |	Introduction to Functional Programming	
+G51IAI |	Introduction to Artificial Intelligence	
+G51MCS |	Mathematics for Computer Scientists	
+G51OOP |	Introduction to Object-Oriented Programming	
+G51PRG |	Introduction to Programming	
+G51REQ |	Introduction to Requirements Engineering	
+G51TUT |	Computer Science First Year Tutorial	
+G51UST |	Unix and Software Tools	
+G51WPS |	Web Programming and Scripting	
+G52ADS |	Algorithms and Data Structures	
+G52AFP |	Advanced Functional Programming	
+G52APR |	Application Programming	
+G52APT |	AI Programming Techniques	
+G52CCN |	Computer Communications and Networks	
+G52CON |	Concepts of Concurrency	
+G52CPP |	C++ Programming	
+G52GRP |	Software Engineering Group Project	
+G52GUI |	Graphical User Interfaces	
+G52HCI |	Human Computer Interaction	
+G52IFR |	Introduction to Formal Reasoning	
+G52IMO |	Introduction to Modelling and Optimisation	
+G52MAL |	Machines and their Languages	
+G52PAS |	Planning and Search	
+G52SEM |	Software Engineering Methodologies	
+G52TUT |	Computer Science Second Year Tutorial	
+G53ARS |	Autonomous Robotic Systems	
+G53ASD |	Automated Scheduling	
+G53BIO |	Bioinformatics	
+G53CCT |	Collaboration and Communication Technologies	
+G53CMP |	Compilers	
+G53COM |	Computability	
+G53CWO |	Computers in the World	
+G53DOC |	Programming Documents	
+G53ELC |	Enterprise Level Computing	
+G53FUZ |	Fuzzy Sets and Fuzzy Logic Systems	
+G53GRA |	Computer Graphics	
+G53IDA |	Individual Dissertation Artificial Intelligence	
+G53IDE |	Individual Dissertation for UK Erasmus Students	
+G53IDJ |	Individual Dissertation Joint Honours	
+G53IDS |	Individual Dissertation Single Honours	
+G53IDY |	Individual Dissertation Software Engineering	
+G53KRR |	Knowledge Representation and Reasoning	
+G53NMD |	New Media Design	
+G53OPS |	Operating Systems	
+G53ORO |	Operations Research and Optimisation	
+G53SEC |	Computer Security	
+G53SQM |	Software Quality Management	
+G54999 |	120 Credit Computer Science No Qual Research Student Module	
+G54ACC |	Advanced Computer Communications	
+G54ADM |	System and Network Administration	
+G54ALG |	Algorithm Design	
+G54ARC |	Advanced Computer Architecture	
+G54CCS |	Connected Computing at Scale	
+G54CON |	Horizon DTC Conference paper	
+G54DIA |	Designing Intelligent Agents	
+G54DMT |	Data Mining Techniques and Applications	
+G54FOP |	Mathematical Foundations of Programming	
+G54FPP |	Foundations of Programming Mini-Project	
+G54GRP |	Horizon DTC Group Project	
+G54IHC |	Introduction to Human Computer Interaction	
+G54INT |	Horizon DTC Reflection on Internship	
+G54MDP |	Mobile Device Programming	
+G54MET |	Methods for Understanding Users in Computer Science	
+G54MGA |	MSci Group AI Project	
+G54MGP |	MSci Group Project	
+G54MIA |	MSci AI Individual Project	
+G54MIP |	MSci Individual Project	
+G54MXR |	Mixed, Virtual and Augmented Reality	
+G54ORM |	Operations Research and Modelling	
+G54PDC |	Parallel and Distributed Computing	
+G54PLP |	DTC Digital Society Practice Led Project	
+G54PRG |	Programming	
+G54PRO |	Research Project in Advanced Computing Science	
+G54RP2 |	Research and Professional Skills for DTC students Part II	
+G54RPS |	Research and Professional Skills	
+G54SAI |	Selected Topics in Artificial Intelligence	
+G54SIM |	Simulation for Computer Scientists	
+G54SUM |	Horizon DTC Summer School Reflection and Participation	
+G54UBI |	Ubiquitous Computing	
+G54URP |	DTC Digital Society PhD Research Proposal	
+G64ADS |	Advanced Data Structures	
+G64DBS |	Database Systems	
+G64DEC |	Individual Project: Digital Economy	
+G64HCI |	Individual Project: Human-Computer Interaction	
+G64ICP |	Introduction to Computer Programming	
+G64INC |	Introduction to Network Communications	
+G64MIT |	Management of IT	
+G64OOS |	Object Oriented Systems	
+G64PIT |	Project in Information Technology	
+G64PMI |	Project in the Management of Information Technology
+G64PRE |	Computer Science Technology Transfer Project	
+G64SPM |	Software Project Management	
+G64SWE |	Software Engineering	
