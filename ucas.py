@@ -378,11 +378,19 @@ def staff_signup_submit(db):
                 if d.startswith("dateid-") and state == "on" ]
     iou_slots(staffid, dateids)
     
-    
+    db.execute("SELECT `dates`.dateid "
+               +"  FROM `ucas.dates` AS `dates` "
+               +"  INNER JOIN `ucas.slots` as `slots` "
+               +"    ON `slots`.dateid = `dates`.dateid "
+               +"  WHERE `slots`.staffid = %s",
+               (staffid,)
+               )
+    checked_dates = [ d['dateid'] for d in db.fetchall() ]
     db.execute("SELECT * FROM `ucas.dates`")
     dates = db.fetchall()
-    for d in dates:
-        if d['dateid'] in dateids: d['checked'] = True
+    for date in dates:
+        date['checked'] = (date['dateid'] in checked_dates)
+            
     staff['dates'] = dates
 
     data = Data()
