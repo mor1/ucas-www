@@ -65,7 +65,7 @@
     <label class="radio">
       <input type="radio" name="slotid" value="{{ slots[0]['slotid'] }}"
              checked />
-      <small>at</small> {{ slots[0]['slot'] }}
+      <small>at</small> {{ slots[0]['date'] }}
       <small>in</small> {{ slots[0]['room'] }}
       <small>with</small> {{ slots[0]['staffname'] }}
       <small>who teaches</small> 
@@ -81,7 +81,7 @@
 %for slot in slots[1:]:
     <label class="radio">
       <input type="radio" name="slotid" value="{{ slot['slotid'] }}" />
-      <small>at</small> {{ slot['slot'] }}
+      <small>at</small> {{ slot['date'] }}
       <small>in</small> {{ slot['room'] }}
       <small>with</small> {{ slot['staffname'] }}
       <small>who teaches</small>

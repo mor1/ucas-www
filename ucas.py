@@ -42,19 +42,36 @@ STATIC_FILES = ('favicon.ico', 'robots.txt', 'css/ucas.css',
 BASE_URL = "http://modulecatalogue.nottingham.ac.uk/nottingham/asp/moduledetails.asp"
 SLOTS_SQL = (
     "SELECT "
-    + " slots.slotid, slots.slot, slots.room, slots.spaces, "
-    + " staff.staffid, staff.staffname, staff.research "
-    + "  FROM `ucas.slots` AS `slots` "
-    + "  INNER JOIN `ucas.staff` AS `staff` "
-    + "  ON `slots`.staffid = `staff`.staffid "
-    + "  WHERE `slots`.spaces > 0 "
-    + "  ORDER BY `slots`.slot, `slots`.spaces DESC"
+    +" slots.slotid, slots.room, slots.spaces, "
+    +" staff.staffid, staff.staffname, staff.research, "
+    +" dates.date "
+    +"FROM `ucas.slots` AS `slots` "
+    +"  INNER JOIN `ucas.staff` AS `staff` "
+    +"    ON `slots`.staffid = `staff`.staffid "
+    +"  INNER JOIN `ucas.dates` AS `dates` "
+    +"    ON `slots`.dateid = `dates`.dateid "
+    +"WHERE `slots`.spaces > 0 "
+    +"  ORDER BY `dates`.date, `slots`.spaces DESC"
     )
 
 MODULES_SQL = (
     "SELECT "
-    + " modules.staffid, modules.code, modules.crsid "
-    + "FROM `ucas.modules` AS `modules` "
+    +" modules.code, modules.crsid, teaching.staffid "
+    +"FROM `ucas.modules` AS `modules` "
+    +"  INNER JOIN `ucas.teaching` AS `teaching` "
+    +"WHERE `modules`.code = `teaching`.code"
+    )
+
+INS_STAFF_SQL = (
+    'INSERT INTO `ucas.staff`'
+    + ' (staffid, staffname, research)'
+    + 'VALUES (%s, %s, %s)'
+    )
+
+UPD_STAFF_SQL = (
+    'UPDATE `ucas.staff`'
+    +' SET `staffname`=%s, `research`=%s'
+    +' WHERE `staffid`=%s'
     )
 
 import bottle, bottle_mysql, hashlib
@@ -140,13 +157,18 @@ def retrieve_booking(db, ucasid=None, name=None):
         logging.info("- retrieve: ucasid failed validation")
         return template('root', data=data, booking=booking)
     
-    cmd = "SELECT `ucas.bookings`.*, `ucas.slots`.*, `ucas.staff`.* "\
-        + "  FROM `ucas.bookings` "\
-        + "  INNER JOIN `ucas.slots` "\
-        + "    ON `ucas.bookings`.slotid = `ucas.slots`.slotid "\
-        + "  INNER JOIN `ucas.staff` "\
-        + "    ON `ucas.slots`.staffid = `ucas.staff`.staffid "\
-        + "  WHERE `ucas.bookings`.ucasid = %s AND `ucas.bookings`.name = %s"
+    cmd = (
+        "SELECT `ucas.bookings`.*, `ucas.slots`.*, `ucas.staff`.*, `ucas.dates`.* "
+        + "  FROM `ucas.bookings` "
+        + "  INNER JOIN `ucas.slots` "
+        + "    ON `ucas.bookings`.slotid = `ucas.slots`.slotid "
+        + "  INNER JOIN `ucas.staff` "
+        + "    ON `ucas.slots`.staffid = `ucas.staff`.staffid "
+        + "  INNER JOIN `ucas.dates` "
+        + "    ON `ucas.dates`.dateid = `ucas.slots`.dateid"        
+        + "  WHERE `ucas.bookings`.ucasid = %s "
+        + "    AND `ucas.bookings`.name = %s "
+        )
     n = db.execute(cmd, (ucasid, name))
     if n != 1: data.error = "booking-mismatch"
     else:
@@ -156,6 +178,8 @@ def retrieve_booking(db, ucasid=None, name=None):
     if data.error: logging.info("- retrieve: %s" % (data.error,))
     else:
         logging.info('- retreive: booking="%s"' % (booking,))
+
+    logging.info(booking)
 
     return template('root', data=data, booking=booking)
 
@@ -293,7 +317,8 @@ def staff_signup(db):
         db.execute("SELECT * FROM `ucas.dates`")
         dates = db.fetchall()
         data.breadcrumbs.append(("Staff Signup", "/staff/signup"))
-        return template('staff-signup', data=data, dates=dates)
+        return template('staff-signup', data=data, dates=dates, staff=None)
+    
     else:
         data.error = 'signup-login'
         data.breadcrumbs.append(("Staff Login", "/staff/login"))
@@ -301,10 +326,69 @@ def staff_signup(db):
 
 @app.post('/staff/signup')
 def staff_signup_submit(db):
-    logging.info(request.forms.items())
+    def iou_staff(staffid, name, research):
+        db.execute(
+            'SELECT COUNT(*) FROM `ucas.staff` WHERE `staffid`=%s',
+            (staffid,))
+        n = db.fetchone().values()[0]
+        if n == 0:
+            db.execute(INS_STAFF_SQL, (staffid, name, research))
+        else:
+            db.execute(UPD_STAFF_SQL, (name, research, staffid))
+    
+    def iou_teaching(staffid, modules):
+        db.execute("DELETE FROM `ucas.teaching` WHERE `staffid`=%s", 
+                   staffid)
+        for m in modules:
+            db.execute("INSERT INTO `ucas.teaching` "
+                       +" (staffid, code) "
+                       +"VALUES (%s, %s)",
+                       (staffid, m))
+    
+    def iou_slots(staffid, dateids):
+        for dateid in dateids:
+            db.execute("SELECT COUNT(*) FROM `ucas.slots` "
+                       +"WHERE `staffid`=%s AND `dateid`=%s", 
+                       (staffid, dateid))
+            n = db.fetchone().values()[0]
+            if n == 0:
+                db.execute("INSERT INTO `ucas.slots` (dateid, staffid) "
+                           +"VALUES (%s, %s)", 
+                           (dateid, staffid))
+        db.execute("SELECT slotid, dateid FROM `ucas.slots` "
+                   +"WHERE `staffid`=%s AND `spaces`=6", staffid)
+        slots = db.fetchall()
+        for slot in slots:
+            if slot['dateid'] not in dateids:
+                db.execute("DELETE FROM `ucas.slots` WHERE `slotid`=%s", 
+                           (slot['slotid'],))
+            
+    staffid = request.forms.userid
+    name = request.forms.name
+    research = request.forms.research
+    staff = { 'staffid': staffid, 'staffname': name, 'research': research, }
+    iou_staff(staffid, name, research)
+
+    modules = [ m.strip() for m in request.forms.modules.split(",") ]
+    staff['modules'] = modules
+    iou_teaching(staffid, modules)
+
+    dateids = [ long(d.split("-")[1])
+                for (d,state) in request.forms.items() 
+                if d.startswith("dateid-") and state == "on" ]
+    iou_slots(staffid, dateids)
+    
+    
+    db.execute("SELECT * FROM `ucas.dates`")
+    dates = db.fetchall()
+    for d in dates:
+        if d['dateid'] in dateids: d['checked'] = True
+    staff['dates'] = dates
+
     data = Data()
     data.breadcrumbs.append(("Staff Signups", "/staff/signup"))
-    return template('staff-signups', data=data)
+    data.error = 'update-success'
+    return template('staff-signup', data=data, staff=staff, dates=dates)
 
 if __name__ == '__main__':
     bottle.run(app, host='localhost', port=8080, reloader=True, debug=True)

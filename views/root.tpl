@@ -19,7 +19,7 @@
     <small>
       UCAS Personal Number {{ booking['ucasid'] }}
     </small>
-    is booked in at {{ booking['slot'] }}
+    is booked in at {{ booking['date'] }}
     in {{ booking['room'] }}
     with {{ booking['staffname'] }}
   </strong>

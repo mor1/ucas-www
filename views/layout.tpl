@@ -64,7 +64,11 @@ _gaq.push(['_trackPageview']);
               <span class="divider">/</span>
             </li>
 %end
-            <li class="active">{{ data.breadcrumbs[-1][0] }}</li>
+            <li class="active">
+              <a href="{{ data.breadcrumbs[-1][1] }}">
+                {{ data.breadcrumbs[-1][0] }}
+              </a>
+            </li>
           </ul>
 
       %include

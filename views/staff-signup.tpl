@@ -17,6 +17,9 @@
       <label class="control-label" for="userid">CS User Id</label>
       <div class="controls">
         <input type="text" name="userid" placeholder="e.g., rmm"
+               %if staff:
+               value="{{ staff['staffid'] }}"
+               %end
                required autofocus />
         <small>required</small>
 %if data.error and data.error == "userid-validation":
@@ -32,6 +35,9 @@
       <label class="control-label" for="name">Name</label>
       <div class="controls">
         <input type="text" name="name" placeholder="e.g., Richard Mortier"
+               %if staff:
+               value="{{ staff['staffname'] }}"
+               %end
                required />
         <small>required</small>
       </div>
@@ -42,6 +48,9 @@
       <div class="controls">
         <input type="text" name="research" class="span6"
                placeholder="e.g., systems and networking"
+               %if staff:
+               value="{{ staff['research'] }}"
+               %end
                required />
         <small>required</small>
       </div>
@@ -55,6 +64,9 @@
       <label class="control-label" for="modules">Modules</label>
       <div class="controls">
         <input type="text" name="modules" placeholder="e.g., G54CCS, G54ACC"
+               %if staff:
+               value="{{ ", ".join([ m.upper() for m in staff['modules'] ]) }}"
+               %end
                required />
         <small>required, comma separated</small>
         %if data.error and data.error == "module-validation":
@@ -71,7 +83,12 @@
     
     %for date in dates:
     <label class="checkbox inline" style="margin-left: 2em">
-      <input type="checkbox" name="dateid-{{ date['dateid'] }}" />{{ date['date'] }}
+      <input type="checkbox" name="dateid-{{ date['dateid'] }}" 
+             %if 'checked' in date and date['checked']:
+             checked="checked"
+             %end
+             />
+      {{ date['date'] }}
     </label>
     %end
 
@@ -79,8 +96,14 @@
   <div class="control-group">
     <div class="form-actions pull-left" style="border-top: none">
       <input type="submit" class="btn span4 btn-primary" value="Submit" />
+        %if data.error and data.error == "update-success":
+        <span class="help-inline">
+          <i class="icon-ok"></i>
+          success &ndash; entry updated
+        </span>
+        %end
     </div>
   </div>
 </form>
 
-%rebase layout data=data, dates=dates
+%rebase layout data=data
