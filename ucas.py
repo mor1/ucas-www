@@ -74,7 +74,7 @@ UPD_STAFF_SQL = (
     +' WHERE `staffid`=%s'
     )
 
-import bottle, bottle_mysql, hashlib
+import bottle, bottle_mysql, hashlib, os.path
 from bottle import request, response, template, redirect, error
 
 app = bottle.Bottle()
@@ -294,7 +294,7 @@ def staff_login_submit():
     if check_password(password):
         response.set_cookie("staff-signed-in", "True", 
                             httponly=True, secret=Config.get('www', 'key'))
-        return redirect('/staff/signup')
+        return redirect(os.path.join(ROOT, '/staff/signup'))
 
     else:
         data = Data()
@@ -305,7 +305,7 @@ def staff_login_submit():
 @app.get('/staff/logout')
 def staff_logout():
     response.delete_cookie('staff-signed-in')
-    return redirect('/staff/login')
+    return redirect(os.path.join(ROOT, '/staff/login'))
 
 @app.get('/staff/signup')
 def staff_signup(db):
