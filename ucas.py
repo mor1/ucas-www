@@ -201,7 +201,8 @@ def signup(db):
     data = Data()
     data.breadcrumbs.append(("Signup", "/signup"))
 
-    return template('signup', data=data, slots=get_slots(db), base_url=BASE_URL)
+    return template('signup', 
+                    data=data, slots=get_slots(db), base_url=BASE_URL)
 
 @app.post('/signup')
 def do_signup(db):
@@ -222,14 +223,18 @@ def do_signup(db):
         data.error = "ucasid-validation"
         slots = get_slots(db)
         logging.info("- signup: ucasid failed validation")
-        return template("signup", data=data, booking=booking, slots=slots, base_url=BASE_URL)
+        return template("signup", 
+                        data=data, 
+                        booking=booking, slots=slots, base_url=BASE_URL)
 
     name = validate_name(name)
     if not name:
         data.error = "name-validation"
         slots = get_slots(db)
         logging.info("- signup: name failed validation")
-        return template("signup", data=data, booking=booking, slots=slots, base_url=BASE_URL)
+        return template("signup", 
+                        data=data, 
+                        booking=booking, slots=slots, base_url=BASE_URL)
 
     cmd = "SELECT * FROM `ucas.bookings` WHERE `ucasid`=%s"
     n = db.execute(cmd, (ucasid, ))
@@ -241,7 +246,8 @@ def do_signup(db):
             slots = get_slots(db)
             data.error = "booking-slot-death"
             logging.info("- signup: %s" % (data.error,))
-            return template('signup', data=data, slots=slots, base_url=BASE_URL)
+            return template('signup', 
+                            data=data, slots=slots, base_url=BASE_URL)
 
         cmd = "INSERT INTO `ucas.bookings` VALUES (%s, %s, %s)"
         db.execute(cmd, (ucasid, name, slotid,))
@@ -269,7 +275,8 @@ def do_signup(db):
             else:
                 data.error = "booking-mismatch"
             logging.info("- signup: %s" % (data.error,))
-            return template('signup', data=data, slots=slots, base_url=BASE_URL)
+            return template('signup', 
+                            data=data, slots=slots, base_url=BASE_URL)
 
     from urllib import urlencode
     params = urlencode({'ucasid':ucasid, 'name':name })
@@ -280,7 +287,9 @@ def do_signup(db):
 def staff_login(db):
 
     data = Data()
-    data.breadcrumbs.append(("Staff Login", "/staff/login"))
+    data.breadcrumbs.append(("Staff Login", 
+                             os.path.join(ROOT, "staff/login")))
+    data.action = os.path.join(ROOT, "staff/login")
     return template('login', data=data)
 
 @app.post('/staff/login')
@@ -294,18 +303,20 @@ def staff_login_submit():
     if check_password(password):
         response.set_cookie("staff-signed-in", "True", 
                             httponly=True, secret=Config.get('www', 'key'))
-        return redirect(os.path.join(ROOT, '/staff/signup'))
+        return redirect(os.path.join(ROOT, 'staff/signup'))
 
     else:
         data = Data()
         data.error = "login-password"
-        data.breadcrumbs.append(("Staff Login", "/staff/login"))
+        data.breadcrumbs.append(("Staff Login", 
+                                 os.path.join(ROOT, "staff/login")))
+        data.action = os.path.join(ROOT, "staff/login")
         return template('login', data=data)
 
 @app.get('/staff/logout')
 def staff_logout():
     response.delete_cookie('staff-signed-in')
-    return redirect(os.path.join(ROOT, '/staff/login'))
+    return redirect(os.path.join(ROOT, 'staff/login'))
 
 @app.get('/staff/signup')
 def staff_signup(db):
@@ -321,7 +332,9 @@ def staff_signup(db):
     
     else:
         data.error = 'signup-login'
-        data.breadcrumbs.append(("Staff Login", "/staff/login"))
+        data.breadcrumbs.append(("Staff Login", 
+                                 os.path.join(ROOT, "staff/login")))
+        data.action = os.path.join(ROOT, "staff/login")
         return template('login', data=data)
 
 @app.post('/staff/signup')
