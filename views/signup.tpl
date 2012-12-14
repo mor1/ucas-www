@@ -88,7 +88,9 @@
       %for module in slot['modules'][:-1]:
       <a href="{{ base_url }}?crs_id={{ module['crsid'] }}&year_id=000112">{{ module['code'] }}</a>, 
       %end
+      %if len(slot['modules']) > 0:
       <a href="{{ base_url }}?crs_id={{ slot['modules'][-1]['crsid'] }}&year_id=000112">{{ slot['modules'][-1]['code'] }}</a>
+      %end
       <br />&nbsp;&nbsp;&nbsp;
       <small>and can talk about</small> {{ slot['research'] }}.
       <br />
