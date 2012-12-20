@@ -199,7 +199,8 @@ def signup(db):
     logging.info("+- signup: display form")
 
     data = Data()
-    data.breadcrumbs.append(("Signup", "/signup"))
+    data.breadcrumbs.append(("Signup", 
+                             os.path.join(ROOT, "/signup")))
 
     return template('signup', 
                     data=data, slots=get_slots(db), base_url=BASE_URL)
@@ -327,7 +328,8 @@ def staff_signup(db):
     if signedin:
         db.execute("SELECT * FROM `ucas.dates`")
         dates = db.fetchall()
-        data.breadcrumbs.append(("Staff Signup", "/staff/signup"))
+        data.breadcrumbs.append(("Staff Signup", 
+                                 os.path.join(ROOT, "/staff/signup")))
         return template('staff-signup', data=data, dates=dates, staff=None)
     
     else:
@@ -407,7 +409,8 @@ def staff_signup_submit(db):
     staff['dates'] = dates
 
     data = Data()
-    data.breadcrumbs.append(("Staff Signups", "/staff/signup"))
+    data.breadcrumbs.append(("Staff Signups", 
+                             os.path.join(ROOT, "/staff/signup")))
     data.error = 'update-success'
     return template('staff-signup', data=data, staff=staff, dates=dates)
 
