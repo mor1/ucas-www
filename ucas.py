@@ -50,7 +50,7 @@ SLOTS_SQL = (
     +"    ON `slots`.staffid = `staff`.staffid "
     +"  INNER JOIN `ucas.dates` AS `dates` "
     +"    ON `slots`.dateid = `dates`.dateid "
-    +"WHERE `slots`.spaces > 0 "
+    +"WHERE `slots`.spaces > 0 AND `dates`.date > NOW()"
     +"  ORDER BY `dates`.date, `slots`.spaces DESC"
     )
 
@@ -326,7 +326,7 @@ def staff_signup(db):
     
     data = Data()
     if signedin:
-        db.execute("SELECT * FROM `ucas.dates`")
+        db.execute("SELECT * FROM `ucas.dates` AS `d` WHERE `d`.date > NOW()")
         dates = db.fetchall()
         data.breadcrumbs.append(("Staff Signup", 
                                  os.path.join(ROOT, "staff/signup")))
