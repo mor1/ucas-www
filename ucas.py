@@ -69,7 +69,7 @@ UPD_STAFF_SQL = (
     +' WHERE `staffid`=%s'
     )
 
-import bottle, bottle_mysql, hashlib, os.path
+import bottle, bottle_mysql, hashlib, os.path, MySQLdb
 from bottle import request, response, template, redirect, error
 
 app = bottle.Bottle()
@@ -349,12 +349,11 @@ def do_staff_signup(db):
     def iou_teaching(staffid, modules):
         db.execute("DELETE FROM `ucas.teaching` WHERE `staffid`=%s", 
                    staffid)
-        for m in modules:
-            db.execute("INSERT INTO `ucas.teaching` "
-                       +" (staffid, code) "
-                       +"VALUES (%s, %s)",
-                       (staffid, m))
-    
+        
+        db.executemany("INSERT INTO `ucas.teaching` (staffid, code) "
+                       +" VALUES (%s, %s)",
+                       zip([staffid] * len(modules), modules))
+        
     def iou_slots(staffid, dateids):
         for dateid in dateids:
             db.execute("SELECT COUNT(*) FROM `ucas.slots` "
@@ -400,25 +399,30 @@ def do_staff_signup(db):
         staff['staffname'] = request.forms.name
         if not staff['staffname'] or len(staff['staffname']) == 0:
             data.error = 'update-missing-name'
+            return template('staff-signup', data=data, staff=staff)
 
         staff['research'] = request.forms.research
         if not staff['research'] or len(staff['research']) == 0:
-            if not data.error: data.error = 'update-missing-research'
+            data.error = 'update-missing-research'
+            return template('staff-signup', data=data, staff=staff)
 
-        if not data.error:
-            iou_staff(staffid, staff['staffname'], staff['research'])
+        iou_staff(staffid, staff['staffname'], staff['research'])
 
-        staff['modules'] = [ m.strip() 
-                             for m in request.forms.modules.split(",") ]
-        if not data.error: iou_teaching(staffid, staff['modules'])
+        try:
+            staff['modules'] = [ m.strip() 
+                                 for m in request.forms.modules.split(",") ]
+            iou_teaching(staffid, staff['modules'])
+        except MySQLdb.IntegrityError, ie:
+            logging.info(ie)
+            data.error = "module-validation"
+            return template('staff-signup', data=data, staff=staff)
 
         dateids = [ long(d.split("-")[1])
                     for (d,state) in request.forms.items() 
                     if d.startswith("dateid-") and state == "on" ]
-        if not data.error: iou_slots(staffid, dateids)
+        iou_slots(staffid, dateids)
     
-        if not data.error: 
-            data.error = 'update-success'
+        data.error = 'update-success'
 
     db.execute("SELECT `d`.dateid FROM `ucas.dates` AS `d` "
                +" INNER JOIN `ucas.slots` AS `sl` "
