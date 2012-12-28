@@ -413,7 +413,6 @@ def do_staff_signup(db):
                                  for m in request.forms.modules.split(",") ]
             iou_teaching(staffid, staff['modules'])
         except MySQLdb.IntegrityError, ie:
-            logging.info(ie)
             data.error = "module-validation"
             return template('staff-signup', data=data, staff=staff)
 
