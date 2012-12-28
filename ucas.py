@@ -29,11 +29,6 @@ Config = ConfigParser.ConfigParser()
 Config.read('ucas.ini')
 
 import logging
-logging.basicConfig(
-    format='%(asctime)s - %(name)s - %(levelname)s\n  %(message)s',
-    filename=Config.get("server", "logfile"), 
-    level=logging.INFO
-    )
 
 ROOT = Config.get("server", "root")
 STATIC_FILES = ('favicon.ico', 'robots.txt', 'css/ucas.css',
@@ -215,7 +210,7 @@ def do_signup(db):
     ucasid = request.forms.ucasid
     name   = request.forms.name
     slotid = request.forms.slotid
-    
+
     logging.info('+ signup: ucasid="%s" name="%s" slotid="%s"' % (
             ucasid, name, slotid))
 
@@ -327,10 +322,10 @@ def staff_signup(db):
     data = Data()
     if signedin:
         db.execute("SELECT * FROM `ucas.dates` AS `d` WHERE `d`.date > NOW()")
-        dates = db.fetchall()
+        staff = { 'dates': db.fetchall(), }
         data.breadcrumbs.append(("Staff Signup", 
                                  os.path.join(ROOT, "staff/signup")))
-        return template('staff-signup', data=data, dates=dates, staff=None)
+        return template('staff-signup', data=data, staff=staff)
     
     else:
         data.error = 'signup-login'
@@ -340,7 +335,7 @@ def staff_signup(db):
         return template('login', data=data)
 
 @app.post('/staff/signup')
-def staff_signup_submit(db):
+def do_staff_signup(db):
     def iou_staff(staffid, name, research):
         db.execute(
             'SELECT COUNT(*) FROM `ucas.staff` WHERE `staffid`=%s',
@@ -378,41 +373,70 @@ def staff_signup_submit(db):
                 db.execute("DELETE FROM `ucas.slots` WHERE `slotid`=%s", 
                            (slot['slotid'],))
             
-    staffid = request.forms.userid
-    name = request.forms.name
-    research = request.forms.research
-    staff = { 'staffid': staffid, 'staffname': name, 'research': research, }
-    iou_staff(staffid, name, research)
-
-    modules = [ m.strip() for m in request.forms.modules.split(",") ]
-    staff['modules'] = modules
-    iou_teaching(staffid, modules)
-
-    dateids = [ long(d.split("-")[1])
-                for (d,state) in request.forms.items() 
-                if d.startswith("dateid-") and state == "on" ]
-    iou_slots(staffid, dateids)
-    
-    db.execute("SELECT `dates`.dateid "
-               +"  FROM `ucas.dates` AS `dates` "
-               +"  INNER JOIN `ucas.slots` as `slots` "
-               +"    ON `slots`.dateid = `dates`.dateid "
-               +"  WHERE `slots`.staffid = %s",
-               (staffid,)
-               )
-    checked_dates = [ d['dateid'] for d in db.fetchall() ]
-    db.execute("SELECT * FROM `ucas.dates`")
-    dates = db.fetchall()
-    for date in dates:
-        date['checked'] = (date['dateid'] in checked_dates)
-            
-    staff['dates'] = dates
-
     data = Data()
     data.breadcrumbs.append(("Staff Signups", 
                              os.path.join(ROOT, "staff/signup")))
-    data.error = 'update-success'
-    return template('staff-signup', data=data, staff=staff, dates=dates)
+
+    staffid = request.forms.userid
+    staff = { 'staffid': staffid, }
+
+    db.execute("SELECT * FROM `ucas.dates` AS `d` WHERE `d`.date > NOW()")
+    staff['dates'] = db.fetchall()
+
+    if "retrieve" in request.forms:
+        db.execute("SELECT * FROM `ucas.staff` AS `s` "
+                   +" WHERE `s`.staffid = %s", 
+                   (staffid,))
+        staff.update(db.fetchone())
+        
+        db.execute("SELECT `t`.code FROM `ucas.teaching` AS `t` "
+                   +"WHERE `t`.staffid = %s",
+                   (staffid,))
+        staff['modules'] = map(lambda x: x['code'], db.fetchall())
+
+        data.error = "retrieve-success"
+
+    else:
+        staff['staffname'] = request.forms.name
+        if not staff['staffname'] or len(staff['staffname']) == 0:
+            data.error = 'update-missing-name'
+
+        staff['research'] = request.forms.research
+        if not staff['research'] or len(staff['research']) == 0:
+            if not data.error: data.error = 'update-missing-research'
+
+        if not data.error:
+            iou_staff(staffid, staff['staffname'], staff['research'])
+
+        staff['modules'] = [ m.strip() 
+                             for m in request.forms.modules.split(",") ]
+        if not data.error: iou_teaching(staffid, staff['modules'])
+
+        dateids = [ long(d.split("-")[1])
+                    for (d,state) in request.forms.items() 
+                    if d.startswith("dateid-") and state == "on" ]
+        if not data.error: iou_slots(staffid, dateids)
+    
+        if not data.error: 
+            data.error = 'update-success'
+
+    db.execute("SELECT `d`.dateid FROM `ucas.dates` AS `d` "
+               +" INNER JOIN `ucas.slots` AS `sl` "
+               +"   ON `sl`.dateid = `d`.dateid "
+               +" WHERE `sl`.staffid = %s",
+               (staffid,))
+    checked_dateids = map(lambda x: x['dateid'], db.fetchall())
+    for date in staff['dates']:
+        date['checked'] = (date['dateid'] in checked_dateids)
+
+    return template('staff-signup', data=data, staff=staff)
 
 if __name__ == '__main__':
+    logging.basicConfig(
+        format=
+        '[%(process)s] %(asctime)s - %(name)s - %(levelname)s\n%(message)s',
+        filename=Config.get("server", "logfile"), 
+        level=logging.INFO
+        )
+
     bottle.run(app, host='localhost', port=8080, reloader=True, debug=True)

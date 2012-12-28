@@ -10,36 +10,45 @@
     </h4>
 
     <div class="control-group 
-%if data.error and data.error == "userid-validation":
+      %if data.error and data.error == "userid-validation":
       error
-%end
+      %end
       ">
       <label class="control-label" for="userid">CS User Id</label>
       <div class="controls">
-        <input type="text" name="userid" placeholder="e.g., rmm"
-               %if staff:
+        <input type="text" name="userid" placeholder="e.g., rmm" 
+               %if staff and 'staffid' in staff:
                value="{{ staff['staffid'] }}"
                %end
-               required autofocus />
+               required autofocus 
+               />
         <small>required</small>
-%if data.error and data.error == "userid-validation":
+        %if data.error and data.error == "userid-validation":
         <span class="help-inline">
           <i class="icon-warning-sign"></i>
           invalid CS User Id &ndash; please check and retry
         </span>
-%end
+        %end
+        <input type="submit" class="btn" 
+               name="retrieve" value="retrieve existing record" />
       </div>
-    </div>    
+    </div>
 
     <div class="control-group">
       <label class="control-label" for="name">Name</label>
       <div class="controls">
         <input type="text" name="name" placeholder="e.g., Richard Mortier"
-               %if staff:
+               %if staff and 'staffname' in staff:
                value="{{ staff['staffname'] }}"
                %end
-               required />
+               />
         <small>required</small>
+        %if data.error and data.error == "update-missing-name":
+        <span class="help-inline">
+          <i class="icon-warning-sign"></i>
+          missing user name &ndash; please check and retry
+        </span>
+        %end
       </div>
     </div>    
   
@@ -48,11 +57,17 @@
       <div class="controls">
         <input type="text" name="research" class="span6"
                placeholder="e.g., systems and networking"
-               %if staff:
+               %if staff and 'research' in staff:
                value="{{ staff['research'] }}"
                %end
-               required />
+               />
         <small>required</small>
+        %if data.error and data.error == "update-missing-research":
+        <span class="help-inline">
+          <i class="icon-warning-sign"></i>
+          missing research &ndash; please check and retry
+        </span>
+        %end
       </div>
     </div>    
   
@@ -64,10 +79,10 @@
       <label class="control-label" for="modules">Modules</label>
       <div class="controls">
         <input type="text" name="modules" placeholder="e.g., G54CCS, G54ACC"
-               %if staff:
+               %if staff and 'modules' in staff:
                value="{{ ", ".join([ m.upper() for m in staff['modules'] ]) }}"
                %end
-               required />
+               />
         <small>required, comma separated</small>
         %if data.error and data.error == "module-validation":
         <span class="help-inline">
@@ -81,7 +96,7 @@
     <hr style="margin-bottom: 0" />
     <h4>Dates:</h4>
     
-    %for date in dates:
+    %for date in staff['dates']:
     <label class="checkbox inline" style="margin-left: 2em">
       <input type="checkbox" name="dateid-{{ date['dateid'] }}" 
              %if 'checked' in date and date['checked']:
