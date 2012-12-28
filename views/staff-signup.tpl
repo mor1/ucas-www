@@ -23,14 +23,14 @@
                required autofocus 
                />
         <small>required</small>
+        <input type="submit" class="btn" 
+               name="retrieve" value="retrieve existing record" />
         %if data.error and data.error == "userid-validation":
         <span class="help-inline">
           <i class="icon-warning-sign"></i>
           invalid CS User Id &ndash; please check and retry
         </span>
         %end
-        <input type="submit" class="btn" 
-               name="retrieve" value="retrieve existing record" />
       </div>
     </div>
 

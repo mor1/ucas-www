@@ -383,17 +383,23 @@ def do_staff_signup(db):
     staff['dates'] = db.fetchall()
 
     if "retrieve" in request.forms:
-        db.execute("SELECT * FROM `ucas.staff` AS `s` "
-                   +" WHERE `s`.staffid = %s", 
-                   (staffid,))
-        staff.update(db.fetchone())
+        try:
+            db.execute("SELECT * FROM `ucas.staff` AS `s` "
+                       +" WHERE `s`.staffid = %s", 
+                       (staffid,))
+            staff.update(db.fetchone())
+            
         
-        db.execute("SELECT `t`.code FROM `ucas.teaching` AS `t` "
-                   +"WHERE `t`.staffid = %s",
-                   (staffid,))
-        staff['modules'] = map(lambda x: x['code'], db.fetchall())
-
-        data.error = "retrieve-success"
+            db.execute("SELECT `t`.code FROM `ucas.teaching` AS `t` "
+                       +"WHERE `t`.staffid = %s",
+                       (staffid,))
+            staff['modules'] = map(lambda x: x['code'], db.fetchall())
+            
+            data.error = "retrieve-success"
+        
+        except TypeError, te:
+            data.error = "userid-validation"
+            return template('staff-signup', data=data, staff=staff)
 
     else:
         staff['staffname'] = request.forms.name
