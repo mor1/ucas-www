@@ -70,13 +70,21 @@
       <small>in</small> {{ slots[0]['room'] }}
       %end
       <small>with</small> {{ slots[0]['staffname'] }}
+
+      %if len(slots[0]['modules']) > 0:
       <small>who teaches</small> 
       %for module in slots[0]['modules'][:-1]:
       <a href="{{ base_url }}?crs_id={{ module['crsid'] }}&year_id=000112">{{ module['code'] }}</a>, 
       %end
       <a href="{{ base_url }}?crs_id={{ slots[0]['modules'][-1]['crsid'] }}&year_id=000112">{{ slots[0]['modules'][-1]['code'] }}</a>
       <br />&nbsp;&nbsp;&nbsp;
-      <small>and can talk about</small> {{ slots[0]['research'] }}.
+      <small>and</small>
+      %else:
+      <br />&nbsp;&nbsp;&nbsp;
+      <small>who</small>
+      %end
+
+      <small>can talk about</small> {{ slots[0]['research'] }}.
       <br />
       <small>({{ slots[0]['spaces'] }} places remaining)</small>
     </label>
@@ -88,15 +96,21 @@
       <small>in</small> {{ slot['room'] }}
       %end
       <small>with</small> {{ slot['staffname'] }}
+
+      %if len(slot['modules']) > 0:
       <small>who teaches</small>
       %for module in slot['modules'][:-1]:
       <a href="{{ base_url }}?crs_id={{ module['crsid'] }}&year_id=000112">{{ module['code'] }}</a>, 
       %end
-      %if len(slot['modules']) > 0:
       <a href="{{ base_url }}?crs_id={{ slot['modules'][-1]['crsid'] }}&year_id=000112">{{ slot['modules'][-1]['code'] }}</a>
-      %end
       <br />&nbsp;&nbsp;&nbsp;
-      <small>and can talk about</small> {{ slot['research'] }}.
+      <small>and</small>
+      %else:
+      <br />&nbsp;&nbsp;&nbsp;
+      <small>who</small>
+      %end
+
+      <small>can talk about</small> {{ slot['research'] }}.
       <br />
       <small>({{ slot['spaces'] }} places remaining)</small>
     </label>
