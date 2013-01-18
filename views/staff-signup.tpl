@@ -1,5 +1,5 @@
 <p>
-  <a class="btn" href="/staff/logout">logout</a>
+  <a class="btn" href="logout">logout</a>
   Welcome! You are now logged in.
 </p>
 
