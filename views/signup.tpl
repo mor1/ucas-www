@@ -18,7 +18,7 @@
       Enter your details and select a slot:
     </h4>
 
-    <div class="control-group 
+    <div class="control-group
 %if data.error and data.error == "ucasid-validation":
       error
 %end
@@ -35,7 +35,7 @@
         </span>
 %end
       </div>
-    </div>    
+    </div>
     <div class="control-group
 %if data.error and data.error in ("booking-mismatch", "name-validation"):
       error
@@ -72,11 +72,11 @@
       <small>with</small> {{ slots[0]['staffname'] }}
 
       %if len(slots[0]['modules']) > 0:
-      <small>who teaches</small> 
+      <small>who teaches</small>
       %for module in slots[0]['modules'][:-1]:
-      <a href="{{ base_url }}?crs_id={{ module['crsid'] }}&year_id=000112">{{ module['code'] }}</a>, 
+      <a href="{{ base_url }}?crs_id={{ module['crsid'] }}&year_id=000113">{{ module['code'] }}</a>,
       %end
-      <a href="{{ base_url }}?crs_id={{ slots[0]['modules'][-1]['crsid'] }}&year_id=000112">{{ slots[0]['modules'][-1]['code'] }}</a>
+      <a href="{{ base_url }}?crs_id={{ slots[0]['modules'][-1]['crsid'] }}&year_id=000113">{{ slots[0]['modules'][-1]['code'] }}</a>
       <br />&nbsp;&nbsp;&nbsp;
       <small>and</small>
       %else:
@@ -100,9 +100,9 @@
       %if len(slot['modules']) > 0:
       <small>who teaches</small>
       %for module in slot['modules'][:-1]:
-      <a href="{{ base_url }}?crs_id={{ module['crsid'] }}&year_id=000112">{{ module['code'] }}</a>, 
+      <a href="{{ base_url }}?crs_id={{ module['crsid'] }}&year_id=000113">{{ module['code'] }}</a>,
       %end
-      <a href="{{ base_url }}?crs_id={{ slot['modules'][-1]['crsid'] }}&year_id=000112">{{ slot['modules'][-1]['code'] }}</a>
+      <a href="{{ base_url }}?crs_id={{ slot['modules'][-1]['crsid'] }}&year_id=000113">{{ slot['modules'][-1]['code'] }}</a>
       <br />&nbsp;&nbsp;&nbsp;
       <small>and</small>
       %else:
