@@ -69,6 +69,17 @@ UPD_STAFF_SQL = (
     +' WHERE `staffid`=%s'
     )
 
+UPCOMING_SQL = (
+    'SELECT b.ucasid, b.name, s.staffid, s.spaces, d.date '
+    +'FROM `ucas.slots` AS s '
+    +'INNER JOIN `ucas.bookings` AS b '
+    +'  ON b.slotid = s.slotid '
+    +'INNER JOIN `ucas.dates` AS d '
+    +'  ON s.dateid = d.dateid '
+    +'WHERE d.date > NOW() '
+    +'ORDER BY date'
+    )
+
 import bottle, bottle_mysql, hashlib, os.path, MySQLdb
 from bottle import request, response, template, redirect, error
 
