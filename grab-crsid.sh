@@ -26,10 +26,10 @@
 
 ## set -ex
 
-URL=http://modulecatalogue.nottingham.ac.uk/Nottingham/asp/FindModule.asp\
+URL=http://modulecatalogue.nottingham.ac.uk/Nottingham/asp/FindModule.asp
 
 for m in $(cut -f1 -d '|' module-codes.txt) ; do
-    CRSID=$(curl -v -d year_id=000112 -d cmdMnem=search -d mnem=$m $URL 2>&1 \
+    CRSID=$(curl -v -d year_id=000113 -d cmdMnem=search -d mnem=$m $URL 2>&1 \
         | grep Location | cut -b 38-43)
     echo '( "'$m'", "'$CRSID'" ),'
 done
