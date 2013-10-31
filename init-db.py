@@ -30,15 +30,6 @@ Config.read('ucas.ini')
 
 import MySQLdb
 
-Create_user = False
-
-Add_dates = True
-Add_modules = True
-Add_staff = True
-Add_teaching = True
-Add_slots = True
-Add_bookings = True
-
 def create_user():
     ## as root
     host = Config.get("database", "host")
@@ -68,21 +59,17 @@ create table if not exists `rmm`.`ucas.dates` (
 insert into `rmm`.`ucas.dates`
   (date)
 values
-  ("2012-11-21 14:00"),
-  ("2012-12-05 14:00"),
-  ("2013-01-23 14:00"),
-  ("2013-01-30 14:00"),
-  ("2013-02-06 14:00"),
-  ("2013-02-13 14:00"),
-  ("2013-02-16 14:00"),
-  ("2013-02-20 14:00"),
-  ("2013-02-27 14:00"),
-  ("2013-03-06 14:00"),
-  ("2013-03-13 14:00"),
-  ("2013-03-16 14:00"),
-  ("2013-03-20 14:00"),
-  ("2013-03-27 14:00"),
-  ("2013-04-03 14:00")
+  ("2014-01-29 14:00"),
+  ("2014-02-05 14:00"),
+  ("2014-02-12 14:00"),
+  ("2014-02-15 14:00"),
+  ("2014-02-19 14:00"),
+  ("2014-02-26 14:00"),
+  ("2014-03-12 14:00"),
+  ("2014-03-15 14:00"),
+  ("2014-03-19 14:00"),
+  ("2014-03-26 14:00"),
+  ("2014-04-02 14:00")
 """)
 
 def add_modules(dbc):
@@ -280,7 +267,7 @@ create table if not exists `rmm`.`ucas.bookings` (
 
 if __name__ == '__main__':
 
-    if Create_user:
+    if False:
         create_user()
         sys.exit(0)
 
@@ -291,11 +278,11 @@ if __name__ == '__main__':
         )
     dbc = db.cursor()
 
-    if Add_dates: add_dates(dbc)
-    if Add_modules: add_modules(dbc)
-    if Add_staff: add_staff(dbc)
-    if Add_teaching: add_teaching(dbc)
-    if Add_slots: add_slots(dbc)
-    if Add_bookings: add_bookings(dbc)
+    if True: add_dates(dbc)
+    if False: add_modules(dbc)
+    if False: add_staff(dbc)
+    if False: add_teaching(dbc)
+    if False: add_slots(dbc)
+    if False: add_bookings(dbc)
 
     db.commit()
