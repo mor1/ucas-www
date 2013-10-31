@@ -7,7 +7,7 @@
 # modification, are permitted provided that the following conditions are met:
 #
 # 1. Redistributions of source code must retain the above copyright notice,
-#    this list of conditions and the following disclaimer. 
+#    this list of conditions and the following disclaimer.
 # 2. Redistributions in binary form must reproduce the above copyright notice,
 #    this list of conditions and the following disclaimer in the documentation
 #    and/or other materials provided with the distribution.
@@ -87,14 +87,14 @@ app = bottle.Bottle()
 plugin = bottle_mysql.Plugin(
     dbhost=Config.get('database', 'host'),
     dbuser=Config.get('database', 'user'),
-    dbpass=Config.get('database', 'pass'), 
+    dbpass=Config.get('database', 'pass'),
     dbname=Config.get('database', 'name')
     )
 app.install(plugin)
 
 def validate_ucasid(ucasid=None):
     '''Accept any separators or junk, return properly formatted version.'''
-    
+
     if not ucasid: return None
 
     ds = ''.join([ s for s in ucasid if s.isdigit() ])
@@ -151,18 +151,18 @@ def retrieve_booking(db, ucasid=None, name=None):
 
     logging.info("+ retrieve: ucasid='%s' name='%s'" % (ucasid, name))
 
-    if not ucasid: 
+    if not ucasid:
         ## entry page, permitting booking retrieval
         logging.info("- retrieve: root page")
         return template('root', data=data, booking=booking)
-    
+
     ucasid = validate_ucasid(ucasid)
     if not ucasid:
         ## mash data.error
         data.error = "ucasid-validation"
         logging.info("- retrieve: ucasid failed validation")
         return template('root', data=data, booking=booking)
-    
+
     cmd = (
         "SELECT `ucas.bookings`.*, `ucas.slots`.*, `ucas.staff`.*, `ucas.dates`.* "
         + "  FROM `ucas.bookings` "
@@ -171,7 +171,7 @@ def retrieve_booking(db, ucasid=None, name=None):
         + "  INNER JOIN `ucas.staff` "
         + "    ON `ucas.slots`.staffid = `ucas.staff`.staffid "
         + "  INNER JOIN `ucas.dates` "
-        + "    ON `ucas.dates`.dateid = `ucas.slots`.dateid"        
+        + "    ON `ucas.dates`.dateid = `ucas.slots`.dateid"
         + "  WHERE `ucas.bookings`.ucasid = %s "
         + "    AND `ucas.bookings`.name = %s "
         )
@@ -190,13 +190,13 @@ def retrieve_booking(db, ucasid=None, name=None):
     return template('root', data=data, booking=booking)
 
 @app.get('/<filename:path>')
-def static(filename): 
+def static(filename):
     '''Retrieve static resource.'''
 
     logging.info("+- static: filename='%s'" % (filename,))
     if filename in STATIC_FILES:
         return bottle.static_file(filename, root='./static')
-    return bottle.HTTPError(404, "Page not found")            
+    return bottle.HTTPError(404, "Page not found")
 
 @app.get('/signup')
 def signup(db):
@@ -205,10 +205,10 @@ def signup(db):
     logging.info("+- signup: display form")
 
     data = Data()
-    data.breadcrumbs.append(("Signup", 
+    data.breadcrumbs.append(("Signup",
                              os.path.join(ROOT, "signup")))
 
-    return template('signup', 
+    return template('signup',
                     data=data, slots=get_slots(db), base_url=BASE_URL)
 
 @app.post('/signup')
@@ -217,7 +217,7 @@ def do_signup(db):
 
     data = Data()
     booking = error = None
-    
+
     ucasid = request.forms.ucasid
     name   = request.forms.name
     slotid = request.forms.slotid
@@ -230,8 +230,8 @@ def do_signup(db):
         data.error = "ucasid-validation"
         slots = get_slots(db)
         logging.info("- signup: ucasid failed validation")
-        return template("signup", 
-                        data=data, 
+        return template("signup",
+                        data=data,
                         booking=booking, slots=slots, base_url=BASE_URL)
 
     name = validate_name(name)
@@ -239,8 +239,8 @@ def do_signup(db):
         data.error = "name-validation"
         slots = get_slots(db)
         logging.info("- signup: name failed validation")
-        return template("signup", 
-                        data=data, 
+        return template("signup",
+                        data=data,
                         booking=booking, slots=slots, base_url=BASE_URL)
 
     cmd = "SELECT * FROM `ucas.bookings` WHERE `ucasid`=%s"
@@ -253,19 +253,19 @@ def do_signup(db):
             slots = get_slots(db)
             data.error = "booking-slot-death"
             logging.info("- signup: %s" % (data.error,))
-            return template('signup', 
+            return template('signup',
                             data=data, slots=slots, base_url=BASE_URL)
 
         cmd = "INSERT INTO `ucas.bookings` VALUES (%s, %s, %s)"
         db.execute(cmd, (ucasid, name, slotid,))
-        
+
     else:
         booking = db.fetchone()
         if (booking and (len(name) > 0 and booking['name'] == name)):
             cmd = "UPDATE `ucas.slots` "\
                 + "SET `spaces` = `spaces`+1 WHERE `slotid`=%s"
             db.execute(cmd, (booking['slotid'],))
-            
+
             cmd = "UPDATE `ucas.slots` "\
                 + "SET `spaces` = `spaces`-1 "\
                 + "WHERE `slotid`=%s AND `spaces`>0"
@@ -282,7 +282,7 @@ def do_signup(db):
             else:
                 data.error = "booking-mismatch"
             logging.info("- signup: %s" % (data.error,))
-            return template('signup', 
+            return template('signup',
                             data=data, slots=slots, base_url=BASE_URL)
 
     from urllib import urlencode
@@ -294,28 +294,28 @@ def do_signup(db):
 def staff_login(db):
 
     data = Data()
-    data.breadcrumbs.append(("Staff Login", 
+    data.breadcrumbs.append(("Staff Login",
                              os.path.join(ROOT, "staff/login")))
     data.action = os.path.join(ROOT, "staff/login")
     return template('login', data=data)
 
 @app.post('/staff/login')
 def staff_login_submit():
-    
+
     def check_password(p):
         sha = hashlib.sha1(p).hexdigest()
         return (sha == Config.get('www', 'pass'))
 
     password = request.forms.get('password')
     if check_password(password):
-        response.set_cookie("staff-signed-in", "True", 
+        response.set_cookie("staff-signed-in", "True",
                             httponly=True, secret=Config.get('www', 'key'))
         return redirect(os.path.join(ROOT, 'staff/signup'))
 
     else:
         data = Data()
         data.error = "login-password"
-        data.breadcrumbs.append(("Staff Login", 
+        data.breadcrumbs.append(("Staff Login",
                                  os.path.join(ROOT, "staff/login")))
         data.action = os.path.join(ROOT, "staff/login")
         return template('login', data=data)
@@ -329,18 +329,18 @@ def staff_logout():
 def staff_signup(db):
     signedin = bool(request.get_cookie(
         "staff-signed-in", secret=Config.get('www', 'key')))
-    
+
     data = Data()
     if signedin:
         db.execute("SELECT * FROM `ucas.dates` AS `d` WHERE `d`.date > NOW()")
         staff = { 'dates': db.fetchall(), }
-        data.breadcrumbs.append(("Staff Signup", 
+        data.breadcrumbs.append(("Staff Signup",
                                  os.path.join(ROOT, "staff/signup")))
         return template('staff-signup', data=data, staff=staff)
-    
+
     else:
         data.error = 'signup-login'
-        data.breadcrumbs.append(("Staff Login", 
+        data.breadcrumbs.append(("Staff Login",
                                  os.path.join(ROOT, "staff/login")))
         data.action = os.path.join(ROOT, "staff/login")
         return template('login', data=data)
@@ -356,35 +356,35 @@ def do_staff_signup(db):
             db.execute(INS_STAFF_SQL, (staffid, name, research))
         else:
             db.execute(UPD_STAFF_SQL, (name, research, staffid))
-    
+
     def iou_teaching(staffid, modules):
-        db.execute("DELETE FROM `ucas.teaching` WHERE `staffid`=%s", 
+        db.execute("DELETE FROM `ucas.teaching` WHERE `staffid`=%s",
                    staffid)
-        
+
         db.executemany("INSERT INTO `ucas.teaching` (staffid, code) "
                        +" VALUES (%s, %s)",
                        zip([staffid] * len(modules), modules))
-        
+
     def iou_slots(staffid, dateids):
         for dateid in dateids:
             db.execute("SELECT COUNT(*) FROM `ucas.slots` "
-                       +"WHERE `staffid`=%s AND `dateid`=%s", 
+                       +"WHERE `staffid`=%s AND `dateid`=%s",
                        (staffid, dateid))
             n = db.fetchone().values()[0]
             if n == 0:
                 db.execute("INSERT INTO `ucas.slots` (dateid, staffid) "
-                           +"VALUES (%s, %s)", 
+                           +"VALUES (%s, %s)",
                            (dateid, staffid))
         db.execute("SELECT slotid, dateid FROM `ucas.slots` "
                    +"WHERE `staffid`=%s AND `spaces`=6", staffid)
         slots = db.fetchall()
         for slot in slots:
             if slot['dateid'] not in dateids:
-                db.execute("DELETE FROM `ucas.slots` WHERE `slotid`=%s", 
+                db.execute("DELETE FROM `ucas.slots` WHERE `slotid`=%s",
                            (slot['slotid'],))
-            
+
     data = Data()
-    data.breadcrumbs.append(("Staff Signups", 
+    data.breadcrumbs.append(("Staff Signups",
                              os.path.join(ROOT, "staff/signup")))
 
     staffid = request.forms.userid
@@ -396,18 +396,18 @@ def do_staff_signup(db):
     if "retrieve" in request.forms:
         try:
             db.execute("SELECT * FROM `ucas.staff` AS `s` "
-                       +" WHERE `s`.staffid = %s", 
+                       +" WHERE `s`.staffid = %s",
                        (staffid,))
             staff.update(db.fetchone())
-            
-        
+
+
             db.execute("SELECT `t`.code FROM `ucas.teaching` AS `t` "
                        +"WHERE `t`.staffid = %s",
                        (staffid,))
             staff['modules'] = map(lambda x: x['code'], db.fetchall())
-            
+
             data.error = "retrieve-success"
-        
+
         except TypeError, te:
             data.error = "userid-validation"
             return template('staff-signup', data=data, staff=staff)
@@ -426,7 +426,7 @@ def do_staff_signup(db):
         iou_staff(staffid, staff['staffname'], staff['research'])
 
         try:
-            staff['modules'] = [ m.strip() 
+            staff['modules'] = [ m.strip()
                                  for m in request.forms.modules.split(",") ]
             iou_teaching(staffid, staff['modules'])
         except MySQLdb.IntegrityError, ie:
@@ -434,10 +434,10 @@ def do_staff_signup(db):
             return template('staff-signup', data=data, staff=staff)
 
         dateids = [ long(d.split("-")[1])
-                    for (d,state) in request.forms.items() 
+                    for (d,state) in request.forms.items()
                     if d.startswith("dateid-") and state == "on" ]
         iou_slots(staffid, dateids)
-    
+
         data.error = 'update-success'
 
     db.execute("SELECT `d`.dateid FROM `ucas.dates` AS `d` "
@@ -455,7 +455,7 @@ if __name__ == '__main__':
     logging.basicConfig(
         format=
         '[%(process)s] %(asctime)s - %(name)s - %(levelname)s\n%(message)s',
-        filename=Config.get("server", "logfile"), 
+        filename=Config.get("server", "logfile"),
         level=logging.INFO
         )
 

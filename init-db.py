@@ -7,7 +7,7 @@
 # modification, are permitted provided that the following conditions are met:
 #
 # 1. Redistributions of source code must retain the above copyright notice,
-#    this list of conditions and the following disclaimer. 
+#    this list of conditions and the following disclaimer.
 # 2. Redistributions in binary form must reproduce the above copyright notice,
 #    this list of conditions and the following disclaimer in the documentation
 #    and/or other materials provided with the distribution.
@@ -63,7 +63,7 @@ create table if not exists `rmm`.`ucas.dates` (
   primary key (dateid)
 )
 """)
-        
+
     print dbc.execute("""
 insert into `rmm`.`ucas.dates`
   (date)
@@ -93,7 +93,7 @@ create table if not exists `rmm`.`ucas.modules` (
   primary key (code)
 )
 """)
-    
+
     print dbc.execute("""
 insert into `rmm`.`ucas.modules`
   (code, crsid)
@@ -208,9 +208,9 @@ create table if not exists `rmm`.`ucas.staff` (
   primary key (staffid)
 )
 """)
-        
+
     print dbc.execute("""
-insert into `rmm`.`ucas.staff` 
+insert into `rmm`.`ucas.staff`
   (staffid, staffname, research)
 values
   ("bsl", "Brian Logan", "artificial intelligence in general"),
@@ -240,7 +240,7 @@ values
   ("srb", "G53DOC"),
   ("srb", "G51PRG"),
   ("bnk", "G51WPS")
-""") 
+""")
 
 def add_slots(dbc):
     print dbc.execute("""
@@ -253,11 +253,11 @@ create table if not exists `rmm`.`ucas.slots` (
   staffid varchar(5) not null,
   foreign key (staffid) references `ucas.staff`(staffid),
 
-  room varchar(16), 
+  room varchar(16),
   spaces int default 6
 )
 """)
-    
+
     print dbc.execute("""
 insert into `rmm`.`ucas.slots`
   (dateid, staffid, room)
@@ -274,25 +274,25 @@ create table if not exists `rmm`.`ucas.bookings` (
   ucasid varchar(32) not null,
   name varchar(64) not null,
   slotid int not null,
-  foreign key (slotid) references `ucas.slots`(slotid)  
+  foreign key (slotid) references `ucas.slots`(slotid)
 )
 """)
 
 if __name__ == '__main__':
 
-    if Create_user: 
+    if Create_user:
         create_user()
         sys.exit(0)
 
     db = MySQLdb.connect(
         host=Config.get("database", "host"),
-        user=Config.get("database", "user"), 
-        passwd=Config.get("database", "pass"), 
+        user=Config.get("database", "user"),
+        passwd=Config.get("database", "pass"),
         )
     dbc = db.cursor()
 
     if Add_dates: add_dates(dbc)
-    if Add_modules: add_modules(dbc)    
+    if Add_modules: add_modules(dbc)
     if Add_staff: add_staff(dbc)
     if Add_teaching: add_teaching(dbc)
     if Add_slots: add_slots(dbc)
